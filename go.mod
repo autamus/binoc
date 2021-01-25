@@ -3,8 +3,8 @@ module github.com/autamus/binoc
 go 1.15
 
 require (
-	github.com/alecbcs/lookout v1.1.0
-	github.com/autamus/go-parspack v0.1.3-0.20210125043502-98e477ba63d6
+	github.com/alecbcs/lookout v1.1.1-0.20210125155245-63fffe597020
+	github.com/autamus/go-parspack v0.1.3-0.20210125160010-0b9d32010acd
 	github.com/go-git/go-git v4.7.0+incompatible
 	github.com/go-git/go-git/v5 v5.2.0
 	github.com/google/go-github v17.0.0+incompatible
