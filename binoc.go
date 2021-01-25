@@ -44,6 +44,16 @@ func main() {
 	for app := range output {
 		newBranchName := fmt.Sprintf("update-%s", app.Data.Name)
 		commitMessage := fmt.Sprintf("Update %s to %s", app.Data.Name, strings.Join(app.Data.LatestVersion.Value, "."))
+
+		state, err := repo.SearchPR(commitMessage, repoOwner, filepath.Base(os.Args[1]), config.Global.Git.Token)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if state != "not found" {
+			continue
+		}
+
 		mainBranchName, err := repo.GetBranchName(path)
 		if err != nil {
 			log.Fatal(err)
