@@ -7,7 +7,7 @@ import (
 // Config defines the configuration struct for importing settings from ENV Variables
 type Config struct {
 	General general
-	GitHub  github
+	Git     git
 	Repos   repos
 }
 
@@ -18,8 +18,11 @@ type repos struct {
 	Path string
 }
 
-type github struct {
-	Token string
+type git struct {
+	Name     string
+	Username string
+	Email    string
+	Token    string
 }
 
 var (
@@ -28,6 +31,9 @@ var (
 )
 
 func init() {
-	Global.GitHub.Token = os.Getenv("BINOC_GITHUB_TOKEN")
+	Global.Git.Name = os.Getenv("BINOC_GIT_NAME")
+	Global.Git.Username = os.Getenv("BINOC_GIT_USERNAME")
+	Global.Git.Email = os.Getenv("BINOC_GIT_EMAIL")
+	Global.Git.Token = os.Getenv("BINOC_GIT_TOKEN")
 	Global.Repos.Path = ".binoc/sources/"
 }

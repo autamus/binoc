@@ -8,12 +8,10 @@ import (
 	"strings"
 
 	"github.com/autamus/go-parspack"
-
-	"github.com/autamus/go-parspack/pkg"
 )
 
 // Parse walks through the repository and outputs the parsed values of the spack packages.
-func Parse(location string, output chan<- pkg.Package) {
+func Parse(location string, output chan<- Result) {
 	err := filepath.Walk(location, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(filepath.Base(path), ".py") {
 			content, err := ioutil.ReadFile(path)
@@ -26,7 +24,7 @@ func Parse(location string, output chan<- pkg.Package) {
 				return err
 			}
 
-			output <- result
+			output <- Result{Data: result, Path: path}
 		}
 		return nil
 	})
