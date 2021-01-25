@@ -12,6 +12,7 @@ type Config struct {
 }
 
 type general struct {
+	Version string
 }
 
 type repos struct {
@@ -31,6 +32,7 @@ var (
 )
 
 func init() {
+	Global.General.Version = "0.1.0"
 	Global.Git.Name = os.Getenv("BINOC_GIT_NAME")
 	Global.Git.Username = os.Getenv("BINOC_GIT_USERNAME")
 	Global.Git.Email = os.Getenv("BINOC_GIT_EMAIL")
