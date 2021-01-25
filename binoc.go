@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/autamus/binoc/config"
-	"github.com/autamus/binoc/display"
 	"github.com/autamus/binoc/repo"
 	"github.com/autamus/binoc/update"
 )
@@ -54,12 +53,7 @@ func main() {
 	}()
 
 	for app := range output {
-		doneChan := make(chan int, 1)
-		wg := sync.WaitGroup{}
-		wg.Add(1)
-
-		// Display Spinner on Update.
-		go display.SpinnerWait(doneChan, "Updating "+app.Data.Name+"...", &wg)
+		fmt.Printf("Updating %-30s", app.Data.Name+"...")
 
 		newBranchName := fmt.Sprintf("update-%s", app.Data.Name)
 		commitMessage := fmt.Sprintf("Update %s to %s", app.Data.Name, strings.Join(app.Data.LatestVersion.Value, "."))
@@ -70,9 +64,7 @@ func main() {
 		}
 
 		if state != "not found" {
-			doneChan <- 0
-			wg.Wait()
-			fmt.Println()
+			fmt.Println("Skipped")
 			continue
 		}
 
@@ -116,9 +108,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		doneChan <- 0
-		wg.Wait()
-		fmt.Println()
+		fmt.Println("Done")
 	}
 
 }
