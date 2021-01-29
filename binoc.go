@@ -58,14 +58,13 @@ func main() {
 		newBranchName := fmt.Sprintf("update-%s", app.Data.Name)
 		commitMessage := fmt.Sprintf("Update %s to %s", app.Data.Name, strings.Join(app.Data.LatestVersion.Value, "."))
 
-		state, err := repo.SearchPR(commitMessage, repoOwner, filepath.Base(os.Args[1]), config.Global.Git.Token)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if state != "not found" {
+		_, err := repo.SearchPR(commitMessage, repoOwner, filepath.Base(os.Args[1]), config.Global.Git.Token)
+		if err == nil {
 			fmt.Println("Skipped")
 			continue
+		}
+		if err.Error() != "not found" {
+			log.Fatal(err)
 		}
 
 		mainBranchName, err := repo.GetBranchName(path)
@@ -73,9 +72,14 @@ func main() {
 			log.Fatal(err)
 		}
 
-		err = repo.CreateBranch(path, newBranchName)
+		err = repo.PullBranch(path, newBranchName)
 		if err != nil {
-			log.Fatal(err)
+			if err.Error() == "branch not found" {
+				err = repo.CreateBranch(path, newBranchName)
+			}
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
 		err = repo.SwitchBranch(path, newBranchName)
@@ -98,9 +102,19 @@ func main() {
 			log.Fatal(err)
 		}
 
-		err = repo.OpenPR(path, mainBranchName, commitMessage, repoOwner, config.Global.Git.Token, filepath.Base(os.Args[1]))
+		pr, err := repo.SearchPrByBranch(newBranchName, repoOwner, filepath.Base(os.Args[1]), config.Global.Git.Token)
 		if err != nil {
-			log.Fatal(err)
+			if err.Error() == "not found" {
+				err = repo.OpenPR(path, mainBranchName, commitMessage, repoOwner, config.Global.Git.Token, filepath.Base(os.Args[1]))
+			}
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			err = repo.UpdatePR(pr, commitMessage, filepath.Base(os.Args[1]), repoOwner, config.Global.Git.Token)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 
 		err = repo.SwitchBranch(path, mainBranchName)

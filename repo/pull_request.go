@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -42,8 +43,27 @@ func OpenPR(path, mainBranch, prTitle, repoOwner, gitToken, repoName string) (er
 	return err
 }
 
+// UpdatePR updates the Title of a PR.
+func UpdatePR(pr github.Issue, title, repo, repoOwner string, gitToken string) (err error) {
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: gitToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := github.NewClient(tc)
+
+	newPR := github.PullRequest{
+		Title: &title,
+		Body:  &title,
+	}
+
+	_, _, err = client.PullRequests.Edit(ctx, repoOwner, repo, *pr.Number, &newPR)
+	return err
+}
+
 // SearchPR searches for the a pull request with the input name in the given repository + owner.
-func SearchPR(prTitle, repoOwner, repoName, gitToken string) (state string, err error) {
+func SearchPR(prTitle, repoOwner, repoName, gitToken string) (pr github.Issue, err error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitToken},
@@ -54,10 +74,33 @@ func SearchPR(prTitle, repoOwner, repoName, gitToken string) (state string, err 
 
 	result, _, err := client.Search.Issues(ctx, fmt.Sprintf("%s type:pr repo:%s/%s", prTitle, repoOwner, repoName), &github.SearchOptions{})
 	if err != nil {
-		return state, err
+		return pr, err
 	}
 	if len(result.Issues) < 1 {
-		return "not found", nil
+		return pr, errors.New("not found")
 	}
-	return *result.Issues[0].State, nil
+	return result.Issues[0], nil
+}
+
+// SearchPrByBranch checks to see if there is an existing PR based on a specific branch
+// and if so returns the name.
+func SearchPrByBranch(branchName, repoOwner, repoName, gitToken string) (pr github.Issue, err error) {
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: gitToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+
+	client := github.NewClient(tc)
+
+	result, _, err := client.Search.Issues(
+		ctx,
+		fmt.Sprintf("head:%s type:pr repo:%s/%s", branchName, repoOwner, repoName), &github.SearchOptions{})
+	if err != nil {
+		return pr, err
+	}
+	if len(result.Issues) < 1 {
+		return pr, errors.New("not found")
+	}
+	return result.Issues[0], nil
 }

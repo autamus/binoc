@@ -1,9 +1,12 @@
 package repo
 
 import (
+	"errors"
+	"log"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
 )
 
@@ -58,4 +61,44 @@ func GetBranchName(path string) (name string, err error) {
 	name = strings.TrimPrefix(h.Name().String(), "refs/heads/")
 
 	return name, nil
+}
+
+// PullBranch attempts to pull the branch from the git origin.
+func PullBranch(path string, branchName string) (err error) {
+	localBranchReferenceName := plumbing.NewBranchReferenceName(branchName)
+	remoteReferenceName := plumbing.NewRemoteReferenceName("origin", branchName)
+
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return err
+	}
+
+	rem, err := r.Remote("origin")
+	if err != nil {
+		return err
+	}
+
+	refs, err := rem.List(&git.ListOptions{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	found := false
+	for _, ref := range refs {
+		if ref.Name().IsBranch() && ref.Name() == localBranchReferenceName {
+			found = true
+		}
+	}
+
+	if !found {
+		return errors.New("branch not found")
+	}
+
+	err = r.CreateBranch(&config.Branch{Name: branchName, Remote: "origin", Merge: localBranchReferenceName})
+	if err != nil {
+		return err
+	}
+	newReference := plumbing.NewSymbolicReference(localBranchReferenceName, remoteReferenceName)
+	err = r.Storer.SetReference(newReference)
+	return err
 }
