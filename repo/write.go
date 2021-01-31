@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"io/ioutil"
 	"os"
 	"time"
 
@@ -11,13 +12,18 @@ import (
 
 // UpdatePackage patches the package with the current updated package data.
 func UpdatePackage(pkg Result) (err error) {
+	content, err := ioutil.ReadFile(pkg.Path)
+	if err != nil {
+		return err
+	}
+
 	file, err := os.Create(pkg.Path)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	result, err := parspack.Encode(pkg.Data)
+	result, err := parspack.PatchVersion(pkg.Data, string(content))
 	if err != nil {
 		return err
 	}

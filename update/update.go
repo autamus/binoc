@@ -30,7 +30,7 @@ func RunPollWorker(wg *sync.WaitGroup, input <-chan repo.Result, output chan<- r
 
 		result, found := lookout.CheckUpdate(url)
 		if found {
-			if result.Version.Compare(app.Data.LatestVersion.Value) != 0 {
+			if result.Version.Compare(app.Data.LatestVersion.Value) < 0 {
 				resp, err := http.Get(url)
 				if err != nil {
 					log.Fatal(err)
