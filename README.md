@@ -1,2 +1,2 @@
 # binoc
-Binoc is a Lookout Bot that updates containers in Autamus
+Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories.
