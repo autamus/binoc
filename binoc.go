@@ -23,24 +23,11 @@ func main() {
 `)
 	fmt.Printf("Application Version: v%s\n", config.Global.General.Version)
 	fmt.Println()
-	fmt.Println("[Pulling Upstream Repository]")
-
-	path := filepath.Join(config.Global.Repos.Path, filepath.Base(os.Args[1]))
-	repoOwner := filepath.Base(filepath.Dir(os.Args[1]))
-	err := repo.Clone(os.Args[1], path)
-	if err != nil {
-		if err.Error() == "repository already exists" {
-			err = repo.Pull(path)
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 
 	input := make(chan repo.Result, 20)
 	output := make(chan repo.Result, 20)
 	fmt.Println("[Parsing Container Blueprints]")
-	go repo.Parse(path, input)
+	go repo.Parse(config.Global.Repo.Path, input)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)

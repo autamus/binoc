@@ -1,0 +1,31 @@
+name: Binoc
+author: Alec Scott
+description: Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories. 
+inputs:
+  repo_path:
+    description: 'Location of the Package Build Instructions'
+    required: false
+    default: '/'
+  git_name:
+    description: 'Name used within Git for the commits'
+    required: false
+    default: 'Binoc'
+  git_email:
+    description: 'Email used within Git for the commits'
+    required: false
+    default: 'github-action@users.noreply.github.com'
+  git_username:
+    description: 'Username used within Git for pushing commits'
+    required: false
+    default: 'github.actor'
+  git_token:
+    description: 'Token used for authenticating with the upstream repository'
+    required: true
+  parsers_loaded:
+    description: 'Parsing Libraries Enabled'
+    required: false
+    default: spack,docker
+runs:
+  using: docker
+  image: ghcr.io://autamus/binoc:latest
+  
