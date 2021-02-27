@@ -17,11 +17,9 @@ inputs:
   git_username:
     description: 'Username used within Git for pushing commits'
     required: true
-    default: ''
   git_token:
     description: 'Token used for authenticating with the upstream repository'
     required: true
-    default: ''
   parsers_loaded:
     description: 'Parsing Libraries Enabled'
     required: false
