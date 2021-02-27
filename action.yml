@@ -27,7 +27,7 @@ inputs:
     required: false
     default: 'spack'
   general_action:
-    description: 'Tells Binoc if it's running as a GitHub action or not.
+    description: 'Tells Binoc if it's running as a GitHub action or not.'
     required: false
     default: 'true'
 runs:
