@@ -31,8 +31,8 @@ inputs:
     default: true
     
 runs:
-  using: docker
-  image: ghcr.io/autamus/binoc:latest
+  using: 'docker'
+  image: 'Dockerfile'
   
 branding:
   color: 'blue'
