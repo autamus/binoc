@@ -75,3 +75,18 @@ func (p SpackPackage) AddVersion(input results.Result) (err error) {
 func (p SpackPackage) GetLatestVersion() (result version.Version) {
 	return p.Data.LatestVersion.Value
 }
+
+// GetURL is a wrapper for getting the latest url from a spack
+// package.
+func (p SpackPackage) GetURL() (result string) {
+	result = p.Data.URL
+	if p.Data.LatestVersion.URL != "" {
+		result = p.Data.LatestVersion.URL
+	}
+	return result
+}
+
+// GetName is a wrapper which returns the name of a package
+func (p SpackPackage) GetName() string {
+	return p.Data.Name
+}

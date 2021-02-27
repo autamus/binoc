@@ -1,29 +1,22 @@
 package repo
 
 import (
-	"io/ioutil"
 	"os"
 	"time"
 
-	"github.com/autamus/go-parspack"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 // UpdatePackage patches the package with the current updated package data.
 func UpdatePackage(pkg Result) (err error) {
-	content, err := ioutil.ReadFile(pkg.Path)
-	if err != nil {
-		return err
-	}
-
 	file, err := os.Create(pkg.Path)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	result, err := parspack.PatchVersion(pkg.Data, string(content))
+	result, err := pkg.Parser.Encode(pkg.Package)
 	if err != nil {
 		return err
 	}

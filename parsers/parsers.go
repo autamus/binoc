@@ -20,6 +20,8 @@ type Parser interface {
 type Package interface {
 	AddVersion(results.Result) (err error)
 	GetLatestVersion() (result version.Version)
+	GetURL() (result string)
+	GetName() (result string)
 }
 
 type entry struct {
@@ -34,5 +36,5 @@ var (
 
 func registerParser(parser Parser, fileExt string) {
 	name := strings.ToLower(reflect.ValueOf(parser).Type().Name())
-	AvailableParsers[name] = entry{fileExt: fileExt, parser: parser}
+	AvailableParsers[name] = entry{FileExt: fileExt, Parser: parser}
 }

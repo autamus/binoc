@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/go-git/go-git/v5"
@@ -11,8 +12,27 @@ import (
 	"golang.org/x/oauth2"
 )
 
+func getURL(path string) (url string, err error) {
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return url, err
+	}
+	remotes, err := r.Remotes()
+	return remotes[0].Config().URLs[0], nil
+}
+
+func getOwnerName(path string) (repoOwner, repoName string, err error) {
+	url, err := getURL(path)
+	if err != nil {
+		return repoOwner, repoName, err
+	}
+	repoName = strings.TrimSuffix(filepath.Base(url), filepath.Ext(url))
+	repoOwner = filepath.Base(filepath.Dir(url))
+	return repoOwner, repoName, nil
+}
+
 // OpenPR opens a pull request from the input branch to the destination branch.
-func OpenPR(path, mainBranch, prTitle, repoOwner, gitToken, repoName string) (err error) {
+func OpenPR(path, mainBranch, prTitle, gitToken string) (err error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitToken},
@@ -39,12 +59,17 @@ func OpenPR(path, mainBranch, prTitle, repoOwner, gitToken, repoName string) (er
 		MaintainerCanModify: github.Bool(true),
 	}
 
+	repoOwner, repoName, err := getOwnerName(path)
+	if err != nil {
+		return err
+	}
+
 	_, _, err = client.PullRequests.Create(ctx, repoOwner, repoName, pr)
 	return err
 }
 
 // UpdatePR updates the Title of a PR.
-func UpdatePR(pr github.Issue, title, repo, repoOwner string, gitToken string) (err error) {
+func UpdatePR(pr github.Issue, path, title, gitToken string) (err error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitToken},
@@ -58,12 +83,17 @@ func UpdatePR(pr github.Issue, title, repo, repoOwner string, gitToken string) (
 		Body:  &title,
 	}
 
-	_, _, err = client.PullRequests.Edit(ctx, repoOwner, repo, *pr.Number, &newPR)
+	repoOwner, repoName, err := getOwnerName(path)
+	if err != nil {
+		return err
+	}
+
+	_, _, err = client.PullRequests.Edit(ctx, repoOwner, repoName, *pr.Number, &newPR)
 	return err
 }
 
 // SearchPR searches for the a pull request with the input name in the given repository + owner.
-func SearchPR(prTitle, repoOwner, repoName, gitToken string) (pr github.Issue, err error) {
+func SearchPR(path, prTitle, gitToken string) (pr github.Issue, err error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitToken},
@@ -71,6 +101,11 @@ func SearchPR(prTitle, repoOwner, repoName, gitToken string) (pr github.Issue, e
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
+
+	repoOwner, repoName, err := getOwnerName(path)
+	if err != nil {
+		return pr, err
+	}
 
 	result, _, err := client.Search.Issues(ctx, fmt.Sprintf("%s type:pr repo:%s/%s", prTitle, repoOwner, repoName), &github.SearchOptions{})
 	if err != nil {
@@ -84,7 +119,7 @@ func SearchPR(prTitle, repoOwner, repoName, gitToken string) (pr github.Issue, e
 
 // SearchPrByBranch checks to see if there is an existing PR based on a specific branch
 // and if so returns the name.
-func SearchPrByBranch(branchName, repoOwner, repoName, gitToken string) (pr github.Issue, err error) {
+func SearchPrByBranch(path, branchName, gitToken string) (pr github.Issue, err error) {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: gitToken},
@@ -92,6 +127,11 @@ func SearchPrByBranch(branchName, repoOwner, repoName, gitToken string) (pr gith
 	tc := oauth2.NewClient(ctx, ts)
 
 	client := github.NewClient(tc)
+
+	repoOwner, repoName, err := getOwnerName(path)
+	if err != nil {
+		return pr, err
+	}
 
 	result, _, err := client.Search.Issues(
 		ctx,

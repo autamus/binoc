@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 
@@ -26,13 +24,14 @@ func main() {
 
 	input := make(chan repo.Result, 20)
 	output := make(chan repo.Result, 20)
+	path := config.Global.Repo.Path
 	fmt.Println("[Parsing Container Blueprints]")
 
 	// Parse Config Value into list of parser names
 	repo.Init(strings.Split(config.Global.Parsers.Loaded, ","))
 
 	// Begin parsing the repository matching file extentions to parsers.
-	go repo.Parse(config.Global.Repo.Path, input)
+	go repo.Parse(path, input)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -45,12 +44,14 @@ func main() {
 	}()
 
 	for app := range output {
-		fmt.Printf("Updating %-30s", app.Data.Name+"...")
+		name := app.Package.GetName()
 
-		newBranchName := fmt.Sprintf("update-%s", app.Data.Name)
-		commitMessage := fmt.Sprintf("Update %s to %s", app.Data.Name, strings.Join(app.Data.LatestVersion.Value, "."))
+		fmt.Printf("Updating %-30s", name+"...")
 
-		_, err := repo.SearchPR(commitMessage, repoOwner, filepath.Base(os.Args[1]), config.Global.Git.Token)
+		newBranchName := fmt.Sprintf("update-%s", name)
+		commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.Package.GetLatestVersion(), "."))
+
+		_, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
 		if err == nil {
 			fmt.Println("Skipped")
 			continue
@@ -94,16 +95,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		pr, err := repo.SearchPrByBranch(newBranchName, repoOwner, filepath.Base(os.Args[1]), config.Global.Git.Token)
+		pr, err := repo.SearchPrByBranch(path, newBranchName, config.Global.Git.Token)
 		if err != nil {
 			if err.Error() == "not found" {
-				err = repo.OpenPR(path, mainBranchName, commitMessage, repoOwner, config.Global.Git.Token, filepath.Base(os.Args[1]))
+				err = repo.OpenPR(path, mainBranchName, commitMessage, config.Global.Git.Token)
 			}
 			if err != nil {
 				log.Fatal(err)
 			}
 		} else {
-			err = repo.UpdatePR(pr, commitMessage, filepath.Base(os.Args[1]), repoOwner, config.Global.Git.Token)
+			err = repo.UpdatePR(pr, path, commitMessage, config.Global.Git.Token)
 			if err != nil {
 				log.Fatal(err)
 			}
