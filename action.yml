@@ -29,11 +29,7 @@ inputs:
     description: 'Tells Binoc if it's running as a GitHub action or not.
     required: false
     default: true
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+
 runs:
   using: 'docker'
-  image: 'Dockerfile'
-  args:
-    - ${{ inputs.who-to-greet }}
+  image: 'ghcr.io/autamus/binoc:latest'
