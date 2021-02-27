@@ -2,13 +2,33 @@
 name: 'Binoc Bot'
 description: 'Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories.'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  repo_path:
+    description: 'Location of the Package Build Instructions'
+    required: false
+    default: '/'
+  git_name:
+    description: 'Name used within Git for the commits'
+    required: false
+    default: 'Binoc'
+  git_email:
+    description: 'Email used within Git for the commits'
+    required: false
+    default: 'github-action@users.noreply.github.com'
+  git_username:
+    description: 'Username used within Git for pushing commits'
+    required: false
+    default: 'github.actor'
+  git_token:
+    description: 'Token used for authenticating with the upstream repository'
     required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  parsers_loaded:
+    description: 'Parsing Libraries Enabled'
+    required: false
+    default: 'spack'
+  general_action:
+    description: 'Tells Binoc if it's running as a GitHub action or not.
+    required: false
+    default: true
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
