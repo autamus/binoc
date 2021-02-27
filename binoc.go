@@ -27,6 +27,11 @@ func main() {
 	input := make(chan repo.Result, 20)
 	output := make(chan repo.Result, 20)
 	fmt.Println("[Parsing Container Blueprints]")
+
+	// Parse Config Value into list of parser names
+	repo.Init(strings.Split(config.Global.Parsers.Loaded, ","))
+
+	// Begin parsing the repository matching file extentions to parsers.
 	go repo.Parse(config.Global.Repo.Path, input)
 
 	wg := sync.WaitGroup{}

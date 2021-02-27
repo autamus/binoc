@@ -2,6 +2,7 @@ package parsers
 
 import (
 	"crypto/sha256"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -16,16 +17,25 @@ import (
 type Spack struct {
 }
 
+func init() {
+	registerParser(Spack{}, "*.py")
+}
+
 // Decode decodes a Spack Spec using go-parspack
-func (s Spack) Decode(content string) (pkg SpackPackage, err error) {
-	pkg.Raw = content
-	pkg.Data, err = parspack.Decode(string(content))
+func (s Spack) Decode(content string) (pkg Package, err error) {
+	internal, _ := pkg.(SpackPackage)
+	internal.Raw = content
+	internal.Data, err = parspack.Decode(string(content))
 	return pkg, err
 }
 
 // Encode encodes an updated Spack Spec using go-parspack
-func (s Spack) Encode(pkg SpackPackage) (result string, err error) {
-	return parspack.PatchVersion(pkg.Data, pkg.Raw)
+func (s Spack) Encode(pkg Package) (result string, err error) {
+	internal, ok := pkg.(SpackPackage)
+	if !ok {
+		return "", errors.New("cannot encode not a spackPackage")
+	}
+	return parspack.PatchVersion(internal.Data, internal.Raw)
 }
 
 // SpackPackage is a wrapper struct for a Spack Package

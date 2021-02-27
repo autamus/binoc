@@ -9,3 +9,15 @@ type Result struct {
 	Parser  parsers.Parser
 	Path    string
 }
+
+var (
+	enabledParsers map[string]parsers.Parser
+)
+
+// Init all enabled parsers from config.
+func Init(inputParserNames []string) {
+	for _, parserName := range inputParserNames {
+		entry := parsers.AvailableParsers[parserName]
+		enabledParsers[entry.FileExt] = entry.Parser
+	}
+}
