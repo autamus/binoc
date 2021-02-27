@@ -6,6 +6,14 @@ inputs:
     description: 'Location of the Package Build Instructions'
     required: false
     default: '/'
+  git_name:
+    description: 'Name used within Git for the commits'
+    required: false
+    default: 'Binoc'
+  git_email:
+    description: 'Email used within Git for the commits'
+    required: false
+    default: 'github-action@users.noreply.github.com'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
