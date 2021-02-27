@@ -35,6 +35,9 @@ var (
 )
 
 func registerParser(parser Parser, fileExt string) {
+	if AvailableParsers == nil {
+		AvailableParsers = make(map[string]entry)
+	}
 	name := strings.ToLower(reflect.ValueOf(parser).Type().Name())
 	AvailableParsers[name] = entry{FileExt: fileExt, Parser: parser}
 }

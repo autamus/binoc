@@ -16,6 +16,8 @@ var (
 
 // Init all enabled parsers from config.
 func Init(inputParserNames []string) {
+	enabledParsers = make(map[string]parsers.Parser)
+
 	for _, parserName := range inputParserNames {
 		entry := parsers.AvailableParsers[parserName]
 		enabledParsers[entry.FileExt] = entry.Parser

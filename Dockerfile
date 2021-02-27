@@ -16,11 +16,19 @@ RUN go mod download
 # Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
+# Install required packages for building Binoc.
+RUN apk add --no-cache \
+    gcc \
+    build-base \ 
+    binutils \
+    musl-dev \
+    binutils-gold
+
 # Build the Go app
-RUN CGO_ENABLED=0 go build -o binoc .
+RUN go build -o binoc .
 
 # Start again with minimal envoirnment.
-FROM scratch
+FROM alpine
 
 # Set the Current Working Directory inside the container
 WORKDIR /app

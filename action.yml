@@ -24,7 +24,7 @@ inputs:
   parsers_loaded:
     description: 'Parsing Libraries Enabled'
     required: false
-    default: spack,docker
+    default: spack
   general_action:
     description: 'Tells Binoc if it's running as a GitHub action or not.
     required: false

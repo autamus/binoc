@@ -46,12 +46,13 @@ func init() {
 
 func defaultConfig() {
 	Global.General.Version = "0.1.0"
+	Global.Parsers.Loaded = "spack"
 }
 
 func parseConfigEnv() {
 	numSubStructs := reflect.ValueOf(&Global).Elem().NumField()
 	for i := 0; i < numSubStructs; i++ {
-		iter := reflect.ValueOf(Global).Field(i)
+		iter := reflect.ValueOf(&Global).Elem().Field(i)
 		subStruct := strings.ToUpper(iter.Type().Name())
 
 		structType := iter.Type()

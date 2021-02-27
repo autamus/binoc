@@ -23,10 +23,10 @@ func init() {
 
 // Decode decodes a Spack Spec using go-parspack
 func (s Spack) Decode(content string) (pkg Package, err error) {
-	internal, _ := pkg.(SpackPackage)
+	internal := SpackPackage{}
 	internal.Raw = content
 	internal.Data, err = parspack.Decode(string(content))
-	return pkg, err
+	return internal, err
 }
 
 // Encode encodes an updated Spack Spec using go-parspack
