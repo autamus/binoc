@@ -1,4 +1,4 @@
-name: Binoc
+name: 'Binoc'
 author: Alec Scott
 description: Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories. 
 inputs:
