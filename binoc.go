@@ -24,7 +24,12 @@ func main() {
 
 	input := make(chan repo.Result, 20)
 	output := make(chan repo.Result, 20)
+
 	path := config.Global.Repo.Path
+	if config.Global.General.Action == "true" {
+		path = "/github/workspace/" + path
+	}
+
 	fmt.Println("[Parsing Container Blueprints]")
 
 	// Parse Config Value into list of parser names

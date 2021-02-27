@@ -25,6 +25,10 @@ inputs:
     description: 'Parsing Libraries Enabled'
     required: false
     default: spack,docker
+  general_action:
+    description: 'Tells Binoc if it's running as a GitHub action or not.
+    required: false
+    default: true
 runs:
   using: docker
   image: ghcr.io://autamus/binoc:latest

@@ -16,6 +16,7 @@ type Config struct {
 
 type general struct {
 	Version string
+	Action  string
 }
 
 type repo struct {
