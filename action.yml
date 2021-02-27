@@ -2,30 +2,30 @@
 name: 'Binoc Bot'
 description: 'Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories.'
 inputs:
-  repo_path:
+  repo-path:
     description: 'Location of the Package Build Instructions'
     required: false
     default: '/'
-  git_name:
+  git-name:
     description: 'Name used within Git for the commits'
     required: false
     default: 'Binoc'
-  git_email:
+  git-email:
     description: 'Email used within Git for the commits'
     required: false
     default: 'github-action@users.noreply.github.com'
-  git_username:
+  git-username:
     description: 'Username used within Git for pushing commits'
     required: false
     default: 'github.actor'
-  git_token:
+  git-token:
     description: 'Token used for authenticating with the upstream repository'
     required: true
-  parsers_loaded:
+  parsers-loaded:
     description: 'Parsing Libraries Enabled'
     required: false
     default: 'spack'
-  general_action:
+  general-action:
     description: 'Tells Binoc if it's running as a GitHub action or not.
     required: false
     default: true
