@@ -1,13 +1,17 @@
 package repo
 
-import "github.com/autamus/binoc/parsers"
+import (
+	"github.com/alecbcs/cuppa/results"
+	"github.com/autamus/binoc/parsers"
+)
 
 // Result is a reported package and its
 // parsed location from the parsed library.
 type Result struct {
-	Package parsers.Package
-	Parser  parsers.Parser
-	Path    string
+	Package    parsers.Package
+	Parser     parsers.Parser
+	LookOutput results.Result
+	Path       string
 }
 
 var (

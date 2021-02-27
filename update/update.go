@@ -19,7 +19,7 @@ func RunPollWorker(wg *sync.WaitGroup, input <-chan repo.Result, output chan<- r
 		url := app.Package.GetURL()
 		result, found := lookout.CheckUpdate(url)
 		if found && result.Version.Compare(app.Package.GetLatestVersion()) < 0 {
-			app.Package.AddVersion(*result)
+			app.LookOutput = *result
 			output <- app
 		}
 	}

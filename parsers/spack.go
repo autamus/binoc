@@ -2,7 +2,6 @@ package parsers
 
 import (
 	"crypto/sha256"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -23,7 +22,7 @@ func init() {
 
 // Decode decodes a Spack Spec using go-parspack
 func (s Spack) Decode(content string) (pkg Package, err error) {
-	internal := SpackPackage{}
+	internal := &SpackPackage{}
 	internal.Raw = content
 	internal.Data, err = parspack.Decode(string(content))
 	return internal, err
@@ -31,10 +30,7 @@ func (s Spack) Decode(content string) (pkg Package, err error) {
 
 // Encode encodes an updated Spack Spec using go-parspack
 func (s Spack) Encode(pkg Package) (result string, err error) {
-	internal, ok := pkg.(SpackPackage)
-	if !ok {
-		return "", errors.New("cannot encode not a spackPackage")
-	}
+	internal := pkg.(*SpackPackage)
 	return parspack.PatchVersion(internal.Data, internal.Raw)
 }
 
@@ -45,7 +41,7 @@ type SpackPackage struct {
 }
 
 // AddVersion is a wrapper for interacting with a spack package
-func (p SpackPackage) AddVersion(input results.Result) (err error) {
+func (p *SpackPackage) AddVersion(input results.Result) (err error) {
 	resp, err := http.Get(input.Location)
 	if err != nil {
 		return err
@@ -72,13 +68,13 @@ func (p SpackPackage) AddVersion(input results.Result) (err error) {
 
 // GetLatestVersion is a wrapper for getting the latest version from
 // a spack package.
-func (p SpackPackage) GetLatestVersion() (result version.Version) {
+func (p *SpackPackage) GetLatestVersion() (result version.Version) {
 	return p.Data.LatestVersion.Value
 }
 
 // GetURL is a wrapper for getting the latest url from a spack
 // package.
-func (p SpackPackage) GetURL() (result string) {
+func (p *SpackPackage) GetURL() (result string) {
 	result = p.Data.URL
 	if p.Data.LatestVersion.URL != "" {
 		result = p.Data.LatestVersion.URL
@@ -87,6 +83,6 @@ func (p SpackPackage) GetURL() (result string) {
 }
 
 // GetName is a wrapper which returns the name of a package
-func (p SpackPackage) GetName() string {
+func (p *SpackPackage) GetName() string {
 	return p.Data.Name
 }

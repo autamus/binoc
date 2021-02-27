@@ -10,6 +10,11 @@ import (
 
 // UpdatePackage patches the package with the current updated package data.
 func UpdatePackage(pkg Result) (err error) {
+	err = pkg.Package.AddVersion(pkg.LookOutput)
+	if err != nil {
+		return err
+	}
+
 	file, err := os.Create(pkg.Path)
 	if err != nil {
 		return err
