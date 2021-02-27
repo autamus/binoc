@@ -1,6 +1,6 @@
 name: 'Binoc'
-author: Alec Scott
-description: Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories. 
+author: 'Alec Scott'
+description: 'Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories.'
 inputs:
   repo_path:
     description: 'Location of the Package Build Instructions'
@@ -31,5 +31,5 @@ inputs:
     default: true
 runs:
   using: docker
-  image: ghcr.io/autamus/binoc
+  image: ghcr.io/autamus/binoc:latest
   
