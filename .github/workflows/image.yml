@@ -35,4 +35,5 @@ jobs:
           push: true
           tags: |
             ${{ steps.docker_meta.outputs.tags }}
+            ghcr.io/autamus/binoc:latest
           
