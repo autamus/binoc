@@ -1,6 +1,6 @@
 # action.yml
-name: 'Hello Autamus'
-description: 'Greet someone and record the time'
+name: 'Binoc'
+description: 'Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories.'
 inputs:
   who-to-greet:  # id of input
     description: 'Who to greet'
