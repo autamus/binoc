@@ -24,6 +24,11 @@ func main() {
 
 	input := make(chan repo.Result, 20)
 	output := make(chan repo.Result, 20)
+	relay := make(chan repo.Result, 20)
+
+	parsed := 0
+	updated := 0
+	skipped := 0
 
 	path := config.Global.Repo.Path
 	if config.Global.General.Action == "true" {
@@ -36,7 +41,14 @@ func main() {
 	repo.Init(strings.Split(config.Global.Parsers.Loaded, ","))
 
 	// Begin parsing the repository matching file extentions to parsers.
-	go repo.Parse(path, input)
+	go repo.Parse(path, relay)
+	go func() {
+		for app := range relay {
+			parsed++
+			input <- app
+		}
+		close(input)
+	}()
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -59,6 +71,7 @@ func main() {
 		_, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
 		if err == nil {
 			fmt.Println("Skipped")
+			skipped++
 			continue
 		}
 		if err.Error() != "not found" {
@@ -121,6 +134,12 @@ func main() {
 		}
 
 		fmt.Println("Done")
+		updated++
 	}
-
+	fmt.Println()
+	fmt.Println("[Scan Results]")
+	fmt.Printf("%-5d Packages Parsed\n", parsed)
+	fmt.Printf("%-5d Packages Updated\n", updated)
+	fmt.Printf("%-5d Packages Skipped\n", skipped)
+	fmt.Println()
 }
