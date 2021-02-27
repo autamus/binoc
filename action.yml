@@ -31,5 +31,5 @@ inputs:
     default: true
 runs:
   using: docker
-  image: ghcr.io://autamus/binoc:latest
+  image: ghcr.io/autamus/binoc
   
