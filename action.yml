@@ -32,7 +32,7 @@ inputs:
     
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'ghcr.io/autamus/binoc:latest'
   
 branding:
   color: 'blue'
