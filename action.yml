@@ -32,4 +32,4 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'ghcr.io/autamus/binoc:latest'
+  image: 'docker://ghcr.io/autamus/binoc:latest'
