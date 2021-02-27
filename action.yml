@@ -1,5 +1,5 @@
 # action.yml
-name: 'Binoc'
+name: 'Binoc Bot'
 description: 'Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories.'
 inputs:
   repo_path:
@@ -33,3 +33,7 @@ inputs:
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
+
+branding:
+  icon: 'activity'
+  color: 'white'
