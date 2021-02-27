@@ -22,6 +22,14 @@ inputs:
     description: 'Token used for authenticating with the upstream repository'
     required: true
     default: ''
+  parsers_loaded:
+    description: 'Parsing Libraries Enabled'
+    required: false
+    default: 'spack'
+  general_action:
+    description: 'Tells Binoc if it's running as a GitHub action or not.
+    required: false
+    default: 'true'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
