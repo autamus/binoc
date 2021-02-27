@@ -14,6 +14,14 @@ inputs:
     description: 'Email used within Git for the commits'
     required: false
     default: 'github-action@users.noreply.github.com'
+  git_username:
+    description: 'Username used within Git for pushing commits'
+    required: true
+    default: ''
+  git_token:
+    description: 'Token used for authenticating with the upstream repository'
+    required: true
+    default: ''
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
