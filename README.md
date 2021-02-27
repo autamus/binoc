@@ -37,6 +37,8 @@ jobs:
           git_username: ${{ secrets.BINOC_GIT_USERNAME }}
           git_email: ${{ secrets.BINOC_GIT_EMAIL }}
           git_name: ${{ secrets.BINOC_GIT_NAME }}
+          # Location of the package instructions respect to your repository
+          repo_path: '/'
           parsers_loaded: 'spack'
           general_action: 'true'
 ```
