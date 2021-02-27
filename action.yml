@@ -2,10 +2,10 @@
 name: 'Binoc Bot'
 description: 'Binoc is a GitHub Actions Workflow that can update package build instructions in GitHub Repositories.'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
+  repo_path:
+    description: 'Location of the Package Build Instructions'
+    required: false
+    default: '/'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
