@@ -32,7 +32,7 @@ inputs:
   branch_prefix:
     description: 'Tells Binoc what prefix to use when creating branches.'
     required: false
-    default: `binoc/`
+    default: 'binoc/'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
