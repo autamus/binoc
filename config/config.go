@@ -12,6 +12,7 @@ type Config struct {
 	Git     git
 	Repo    repo
 	Parsers parsers
+	Branch  branch
 }
 
 type general struct {
@@ -34,6 +35,10 @@ type parsers struct {
 	Loaded string
 }
 
+type branch struct {
+	Prefix string
+}
+
 var (
 	// Global is the configuration struct for the application.
 	Global Config
@@ -45,8 +50,9 @@ func init() {
 }
 
 func defaultConfig() {
-	Global.General.Version = "0.1.0"
+	Global.General.Version = "0.0.5"
 	Global.Parsers.Loaded = "spack"
+	Global.Branch.Prefix = "binoc/"
 }
 
 func parseConfigEnv() {

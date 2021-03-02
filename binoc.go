@@ -65,7 +65,7 @@ func main() {
 
 		fmt.Printf("Updating %-30s", name+"...")
 
-		newBranchName := fmt.Sprintf("update-%s", name)
+		newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
 		commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
 
 		_, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)

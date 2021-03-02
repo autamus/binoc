@@ -29,6 +29,10 @@ inputs:
     description: 'Tells Binoc if it is running as a GitHub action or not.'
     required: false
     default: 'true'
+  branch_prefix:
+    description: `Tells Binoc what prefix to use when creating branches.`
+    required: false
+    default: `binoc/`
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
