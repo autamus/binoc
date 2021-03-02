@@ -30,7 +30,7 @@ inputs:
     required: false
     default: 'true'
   branch_prefix:
-    description: `Tells Binoc what prefix to use when creating branches.`
+    description: 'Tells Binoc what prefix to use when creating branches.'
     required: false
     default: `binoc/`
 runs:
