@@ -7,8 +7,30 @@ import (
 	"path/filepath"
 )
 
-// Parse walks through the repository and outputs the parsed values of the spack packages.
-func Parse(location string, output chan<- Result) {
+// Parse parses a single file.
+func Parse(path string) (output Result, err error) {
+	for ext, parser := range enabledParsers {
+		match, _ := filepath.Match(ext, filepath.Base(path))
+		if match {
+			content, err := ioutil.ReadFile(path)
+			if err != nil {
+				return output, err
+			}
+
+			result, err := parser.Decode(string(content))
+			if err != nil {
+				return output, err
+			}
+			output = Result{Parser: parser, Package: result, Path: path}
+			break
+		}
+	}
+
+	return output, nil
+}
+
+// ParseDir walks through the repository and outputs the parsed values of the spack packages.
+func ParseDir(location string, output chan<- Result) {
 	err := filepath.Walk(location, func(path string, info os.FileInfo, err error) error {
 		for ext, parser := range enabledParsers {
 			match, _ := filepath.Match(ext, filepath.Base(path))

@@ -41,7 +41,7 @@ func main() {
 	repo.Init(strings.Split(config.Global.Parsers.Loaded, ","))
 
 	// Begin parsing the repository matching file extentions to parsers.
-	go repo.Parse(path, relay)
+	go repo.ParseDir(path, relay)
 	go func() {
 		for app := range relay {
 			parsed++
