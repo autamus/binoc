@@ -22,6 +22,7 @@ type Package interface {
 	GetLatestVersion() (result version.Version)
 	GetURL() (result string)
 	GetName() (result string)
+	GetDependencies() (results []string)
 }
 
 type entry struct {

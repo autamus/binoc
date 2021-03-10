@@ -86,3 +86,8 @@ func (p *SpackPackage) GetURL() (result string) {
 func (p *SpackPackage) GetName() string {
 	return p.Data.Name
 }
+
+// GetDependencies is a wrapper which returns the dependencies of a package
+func (p *SpackPackage) GetDependencies() []string {
+	return p.Data.Dependencies
+}
