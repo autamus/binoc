@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,8 +10,9 @@ import (
 
 // Parse parses a single file.
 func Parse(path string) (output Result, err error) {
+	match := false
 	for ext, parser := range enabledParsers {
-		match, _ := filepath.Match(ext, filepath.Base(path))
+		match, _ = filepath.Match(ext, filepath.Base(path))
 		if match {
 			content, err := ioutil.ReadFile(path)
 			if err != nil {
@@ -25,7 +27,9 @@ func Parse(path string) (output Result, err error) {
 			break
 		}
 	}
-
+	if !match {
+		return output, errors.New("not a valid package format")
+	}
 	return output, nil
 }
 
