@@ -31,13 +31,13 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Run Binoc Scan
-        uses: autamus/binoc@v0.0.5
+        uses: autamus/binoc@v0.0.6
         with:
           git_token: ${{ secrets.BINOC_GIT_TOKEN }}
           git_username: ${{ secrets.BINOC_GIT_USERNAME }}
           git_email: ${{ secrets.BINOC_GIT_EMAIL }}
           git_name: ${{ secrets.BINOC_GIT_NAME }}
-          # Location of the package instructions relative to your repository
+          # Location of the git repository. For all actions this should be '/'.
           repo_path: '/'
           parsers_loaded: 'spack'
           general_action: 'true'
