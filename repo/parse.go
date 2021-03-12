@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -26,7 +27,7 @@ func Parse(path string) (output Result, err error) {
 		}
 	}
 
-	return output, nil
+	return output, errors.New("not a valid package format")
 }
 
 // ParseDir walks through the repository and outputs the parsed values of the spack packages.
