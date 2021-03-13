@@ -27,6 +27,7 @@ func Parse(path string) (output Result, err error) {
 			break
 		}
 	}
+	// If package isn't known report unknown.
 	if !match {
 		return output, errors.New("not a valid package format")
 	}

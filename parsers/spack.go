@@ -17,7 +17,7 @@ type Spack struct {
 }
 
 func init() {
-	registerParser(Spack{}, "*.py")
+	registerParser(Spack{}, "package.py")
 }
 
 // Decode decodes a Spack Spec using go-parspack
