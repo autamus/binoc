@@ -2,7 +2,6 @@ package repo
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -38,7 +37,6 @@ func Parse(path string) (output Result, err error) {
 // ParseDir walks through the repository and outputs the parsed values of the spack packages.
 func ParseDir(location string, output chan<- Result) {
 	err := filepath.Walk(location, func(path string, info os.FileInfo, err error) error {
-		fmt.Println(path)
 		for ext, parser := range enabledParsers {
 			match, _ := filepath.Match(ext, filepath.Base(path))
 			if match {
