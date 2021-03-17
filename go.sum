@@ -51,6 +51,8 @@ github.com/alecbcs/lookout v1.2.1 h1:uZT3q8fXINGCyUhkJtUMgKu/RQG8HkC81cQYZPjD1vo
 github.com/alecbcs/lookout v1.2.1/go.mod h1:dqGs8LA0lwSuFZ2QAZ9kcWpuA9EzEbhliDBSKu4KFk4=
 github.com/alecbcs/lookout v1.2.2-0.20210317154816-7f29bdf7ce5b h1:2r714/tRXzpKA92DxE2vchxYLfdpMMMSNjyibo2R1+c=
 github.com/alecbcs/lookout v1.2.2-0.20210317154816-7f29bdf7ce5b/go.mod h1:dqGs8LA0lwSuFZ2QAZ9kcWpuA9EzEbhliDBSKu4KFk4=
+github.com/alecbcs/lookout v1.2.2-0.20210317180701-8999b76c97f7 h1:w4CtswAWdggHa6On8DoiBAu+GOELk/l6/ZZSQ6uM9q0=
+github.com/alecbcs/lookout v1.2.2-0.20210317180701-8999b76c97f7/go.mod h1:dqGs8LA0lwSuFZ2QAZ9kcWpuA9EzEbhliDBSKu4KFk4=
 github.com/anmitsu/go-shlex v0.0.0-20161002113705-648efa622239 h1:kFOfPq6dUM1hTo4JG6LR5AXSUEsOjtdm0kw0FtQtMJA=
 github.com/anmitsu/go-shlex v0.0.0-20161002113705-648efa622239/go.mod h1:2FmKhYUyUczH0OGQWaF5ceTx0UBShxjsH6f8oGKYe2c=
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPdPJAN/hZIm0C4OItdklCFmMRWYpio=
