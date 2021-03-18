@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/alecbcs/cuppa/version"
+	"github.com/DataDrake/cuppa/version"
 	lookout "github.com/alecbcs/lookout/update"
 	"github.com/autamus/binoc/repo"
 )

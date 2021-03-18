@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/alecbcs/cuppa/results"
-	"github.com/alecbcs/cuppa/version"
+	"github.com/DataDrake/cuppa/results"
+	"github.com/DataDrake/cuppa/version"
 	"github.com/autamus/go-parspack"
 	"github.com/autamus/go-parspack/pkg"
 )

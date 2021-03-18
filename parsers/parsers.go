@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/alecbcs/cuppa/results"
-	"github.com/alecbcs/cuppa/version"
+	"github.com/DataDrake/cuppa/results"
+	"github.com/DataDrake/cuppa/version"
 )
 
 // Parser is a universal parser interface implemented by

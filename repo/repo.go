@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"github.com/alecbcs/cuppa/results"
+	"github.com/DataDrake/cuppa/results"
 	"github.com/autamus/binoc/parsers"
 )
 
