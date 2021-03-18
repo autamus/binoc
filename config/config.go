@@ -50,7 +50,7 @@ func init() {
 }
 
 func defaultConfig() {
-	Global.General.Version = "0.1.0"
+	Global.General.Version = "0.1.1"
 	Global.Parsers.Loaded = "spack"
 	Global.Branch.Prefix = "binoc/"
 }
