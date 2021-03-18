@@ -30,6 +30,8 @@ RUN go build -o binoc .
 # Start again with minimal envoirnment.
 FROM alpine
 
+RUN apk add --no-cache git
+
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
