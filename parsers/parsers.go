@@ -23,6 +23,7 @@ type Package interface {
 	GetURL() (result string)
 	GetName() (result string)
 	GetDependencies() (results []string)
+	GetGitURL() (result string)
 }
 
 type entry struct {

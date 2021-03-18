@@ -67,6 +67,8 @@ github.com/autamus/go-parspack v0.1.5-0.20210315165337-09f1c7e57fc1 h1:TC6761OTM
 github.com/autamus/go-parspack v0.1.5-0.20210315165337-09f1c7e57fc1/go.mod h1:9GMnKPJcx/cNUCYR5JOOqb1+hiNb/JM9POUluJVT40o=
 github.com/autamus/go-parspack v0.1.5-0.20210316181255-5224f3b3b6cd h1:dtcA3jAZfLWgs69jgxauhxS+Wkicw/IgpQ6zMyGTgB0=
 github.com/autamus/go-parspack v0.1.5-0.20210316181255-5224f3b3b6cd/go.mod h1:9GMnKPJcx/cNUCYR5JOOqb1+hiNb/JM9POUluJVT40o=
+github.com/autamus/go-parspack v0.1.5-0.20210318023518-b45b5a5c8ece h1:kWYPYX5nZrG3i+th38enrV1tGEZnXzajSbrFd+H+IWQ=
+github.com/autamus/go-parspack v0.1.5-0.20210318023518-b45b5a5c8ece/go.mod h1:9GMnKPJcx/cNUCYR5JOOqb1+hiNb/JM9POUluJVT40o=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=

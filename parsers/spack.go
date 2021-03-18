@@ -82,6 +82,12 @@ func (p *SpackPackage) GetURL() (result string) {
 	return result
 }
 
+// GetGitURL is a wrapper for getting the latest url from a spack
+// package git repository.
+func (p *SpackPackage) GetGitURL() (result string) {
+	return p.Data.GitURL
+}
+
 // GetName is a wrapper which returns the name of a package
 func (p *SpackPackage) GetName() string {
 	return p.Data.Name
