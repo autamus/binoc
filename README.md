@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Run Binoc Scan
-        uses: autamus/binoc@v0.1.0
+        uses: autamus/binoc@v1
         with:
           git_token: ${{ secrets.BINOC_GIT_TOKEN }}
           git_username: ${{ secrets.BINOC_GIT_USERNAME }}
