@@ -111,10 +111,14 @@ func SearchPR(path, prTitle, gitToken string) (pr github.Issue, err error) {
 	if err != nil {
 		return pr, err
 	}
-	if len(result.Issues) < 1 {
-		return pr, errors.New("not found")
+	if len(result.Issues) > 0 {
+		for i, issue := range result.Issues {
+			if *issue.Title == prTitle {
+				return result.Issues[i], nil
+			}
+		}
 	}
-	return result.Issues[0], nil
+	return pr, errors.New("not found")
 }
 
 // SearchPrByBranch checks to see if there is an existing PR based on a specific branch
@@ -139,8 +143,13 @@ func SearchPrByBranch(path, branchName, gitToken string) (pr github.Issue, err e
 	if err != nil {
 		return pr, err
 	}
-	if len(result.Issues) < 1 {
-		return pr, errors.New("not found")
+	if len(result.Issues) > 1 {
+		for i, issue := range result.Issues {
+			fmt.Println(issue.GetState())
+			if issue.GetState() == "open" {
+				return result.Issues[i], nil
+			}
+		}
 	}
-	return result.Issues[0], nil
+	return pr, errors.New("not found")
 }
