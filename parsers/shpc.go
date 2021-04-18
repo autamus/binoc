@@ -1,8 +1,6 @@
 package parsers
 
 import (
-	"fmt"
-
 	"github.com/DataDrake/cuppa/results"
 	"github.com/DataDrake/cuppa/version"
 	"gopkg.in/yaml.v2"
@@ -60,12 +58,10 @@ func (s SHPC) Encode(pkg Package) (result string, err error) {
 	// encode aliases
 	aliasesMap, err := yaml.Marshal(&AliasMap{internal.Aliases})
 	if string(aliasesMap) != "" && string(aliasesMap) != "{}\n" {
-		fmt.Printf("Map: %s\n", aliasesMap)
 		result = result + string(aliasesMap)
 	}
 	aliasesStruct, err := yaml.Marshal(&AliasStruct{internal.AliasesStruct})
 	if string(aliasesStruct) != "" && string(aliasesStruct) != "{}\n" {
-		fmt.Printf("Struct: '%s'\n", string(aliasesStruct))
 		result = result + string(aliasesStruct)
 	}
 
