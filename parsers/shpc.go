@@ -47,6 +47,7 @@ type ContainerSpec struct {
 	Latest      map[string]string `yaml:"latest"`
 	Versions    map[string]string `yaml:"tags"`
 	Aliases     map[string]string `yaml:"aliases"`
+	Filter      []string          `yaml:"filter"`
 }
 
 // AddVersion adds a tagged version to a container.
@@ -70,9 +71,14 @@ func (s *ContainerSpec) GetLatestVersion() (result version.Version) {
 // GetURL returns the location of a container for Lookout
 func (s *ContainerSpec) GetURL() (result string) {
 	if s.Docker != "" {
-		return "docker://" + s.Docker
+		result = "docker://" + s.Docker
+	} else {
+		result = "https://github.com/" + s.Gh
 	}
-	return "https://github.com/" + s.Gh
+	if len(s.Filter) > 0 {
+		result = result + ":" + s.Filter[0]
+	}
+	return result
 }
 
 // GetGitURL just returns the normal url for a container
