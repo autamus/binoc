@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -13,6 +14,7 @@ import (
 
 func main() {
 	update.Init(config.Global.Git.Token)
+	fmt.Println()
 	fmt.Print(` ____  _                  
 | __ )(_)_ __   ___   ___ 
 |  _ \| | '_ \ / _ \ / __|
@@ -51,9 +53,12 @@ func main() {
 	}()
 
 	wg := sync.WaitGroup{}
-	wg.Add(1)
+	for i := 0; i < runtime.NumCPU()*2; i++ {
+		go update.RunPollWorker(&wg, input, output)
+		wg.Add(1)
+	}
+
 	fmt.Println("[Checking Containers for Updates]")
-	go update.RunPollWorker(&wg, input, output)
 
 	go func() {
 		wg.Wait()
@@ -68,14 +73,22 @@ func main() {
 		newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
 		commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
 
-		_, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
-		if err == nil {
-			fmt.Println("Skipped")
-			skipped++
-			continue
-		}
-		if err.Error() != "not found" {
+		pr, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
+		if err != nil && err.Error() != "not found" {
 			log.Fatal(err)
+		}
+		if err == nil {
+			blacklistFound := false
+			for _, label := range pr.Labels {
+				if *label.Name == config.Global.PR.IgnoreLabel {
+					blacklistFound = true
+				}
+			}
+			if *pr.State == "open" || blacklistFound {
+				fmt.Println("Skipped")
+				skipped++
+				continue
+			}
 		}
 
 		mainBranchName, err := repo.GetBranchName(path)
@@ -113,19 +126,21 @@ func main() {
 			log.Fatal(err)
 		}
 
-		pr, err := repo.SearchPrByBranch(path, newBranchName, config.Global.Git.Token)
-		if err != nil {
-			if err.Error() == "not found" {
-				err = repo.OpenPR(path, mainBranchName, commitMessage, config.Global.Git.Token)
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
+		pr, err = repo.SearchPrByBranch(path, newBranchName, config.Global.Git.Token)
+		if err == nil && *pr.State == "open" {
 			err = repo.UpdatePR(pr, path, commitMessage, config.Global.Git.Token)
 			if err != nil {
 				log.Fatal(err)
 			}
+		} else {
+			if err != nil && err.Error() != "not found" {
+				log.Fatal(err)
+			}
+			err = repo.OpenPR(path, mainBranchName, commitMessage, config.Global.Git.Token)
+			if err != nil {
+				log.Fatal(err)
+			}
+
 		}
 
 		err = repo.SwitchBranch(path, mainBranchName)
