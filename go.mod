@@ -18,7 +18,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210413134643-5e61552d6c78
 	golang.org/x/sys v0.0.0-20210415045647-66c3f260301c // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 replace github.com/DataDrake/cuppa => github.com/autamus/cuppa v1.1.1-0.20210418004658-d449c9b8325c
