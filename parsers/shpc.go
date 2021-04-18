@@ -31,15 +31,16 @@ func (s SHPC) Decode(content string) (pkg Package, err error) {
 // Encode encodes an updated container.yml using a yaml parser.
 func (s SHPC) Encode(pkg Package) (result string, err error) {
 	internal := pkg.(*ContainerSpec)
+	internal.Name = ""
 	output, err := yaml.Marshal(internal)
 	return string(output), err
 }
 
 // ContainerSpec is a wrapper struct for a container.yaml
 type ContainerSpec struct {
-	Name        string
-	Docker      string            `yaml:"docker"`
-	Gh          string            `yaml:"gh"`
+	Name        string            `yaml:"name,omitempty"`
+	Docker      string            `yaml:"docker,omitempty"`
+	Gh          string            `yaml:"gh,omitempty"`
 	Url         string            `yaml:"url"`
 	Maintainer  string            `yaml:"maintainer"`
 	Description string            `yaml:"description"`
