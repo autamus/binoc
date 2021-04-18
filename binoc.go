@@ -123,6 +123,13 @@ func main() {
 			log.Fatal(err)
 		}
 
+		// Pull latest changes to repo before updating package.
+		// This fixes fast-forward errors.
+		err = repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
+		if err != nil && err.Error() != "already up-to-date" {
+			log.Fatal(err)
+		}
+
 		err = repo.Commit(path, commitMessage, config.Global.Git.Name, config.Global.Git.Email)
 		if err != nil {
 			log.Fatal(err)
