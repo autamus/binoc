@@ -18,6 +18,23 @@ func (s SHPC) Decode(content string) (pkg Package, err error) {
 	// Parse YAML file
 	internal := &ContainerSpec{}
 	err = yaml.Unmarshal([]byte(content), &internal)
+	if err != nil {
+		return internal, err
+	}
+	// Attempt to decode aliases by map
+	aMap := AliasMap{}
+	err = yaml.Unmarshal([]byte(content), &aMap)
+	if err != nil {
+		aStruct := AliasStruct{}
+		err = yaml.Unmarshal([]byte(content), &aStruct)
+		if err != nil {
+			return internal, err
+		}
+		internal.AliasesStruct = aStruct.Aliases
+	} else {
+		internal.Aliases = aMap.Aliases
+	}
+
 	// Generate name from URI
 	if internal.Docker != "" {
 		internal.Name = internal.Docker
@@ -33,21 +50,44 @@ func (s SHPC) Encode(pkg Package) (result string, err error) {
 	internal := pkg.(*ContainerSpec)
 	internal.Name = ""
 	output, err := yaml.Marshal(internal)
-	return string(output), err
+	if err != nil {
+		return result, err
+	}
+
+	// encode aliases
+	aliasesMap, err := yaml.Marshal(&AliasMap{internal.Aliases})
+	aliasesStruct, err := yaml.Marshal(&AliasStruct{internal.AliasesStruct})
+
+	return string(output) + string(aliasesMap) + string(aliasesStruct), err
 }
 
 // ContainerSpec is a wrapper struct for a container.yaml
 type ContainerSpec struct {
-	Name        string            `yaml:"name,omitempty"`
-	Docker      string            `yaml:"docker,omitempty"`
-	Gh          string            `yaml:"gh,omitempty"`
-	Url         string            `yaml:"url,omitempty"`
-	Maintainer  string            `yaml:"maintainer"`
-	Description string            `yaml:"description"`
-	Latest      map[string]string `yaml:"latest"`
-	Versions    map[string]string `yaml:"tags"`
-	Aliases     map[string]string `yaml:"aliases,omitempty"`
-	Filter      []string          `yaml:"filter,omitempty"`
+	Name          string            `yaml:"name,omitempty"`
+	Docker        string            `yaml:"docker,omitempty"`
+	Gh            string            `yaml:"gh,omitempty"`
+	Url           string            `yaml:"url,omitempty"`
+	Maintainer    string            `yaml:"maintainer"`
+	Description   string            `yaml:"description"`
+	Latest        map[string]string `yaml:"latest"`
+	Versions      map[string]string `yaml:"tags"`
+	Filter        []string          `yaml:"filter,omitempty"`
+	Aliases       map[string]string `yaml:"-"`
+	AliasesStruct []Alias           `yaml:"-"`
+}
+
+type AliasMap struct {
+	Aliases map[string]string `yaml:"aliases,omitempty"`
+}
+
+type AliasStruct struct {
+	Aliases []Alias `yaml:"aliases,omitempty"`
+}
+
+type Alias struct {
+	Name    string `yaml:"name"`
+	Command string `yaml:"command"`
+	Options string `yaml:"options"`
 }
 
 // AddVersion adds a tagged version to a container.

@@ -73,6 +73,13 @@ func main() {
 		newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
 		commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
 
+		// Pull latest changes to repo before updating package.
+		// This fixes fast-forward errors.
+		err := repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
+		if err != nil && err.Error() != "already up-to-date" {
+			log.Fatal(err)
+		}
+
 		pr, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
 		if err != nil && err.Error() != "not found" {
 			log.Fatal(err)

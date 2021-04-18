@@ -145,7 +145,6 @@ func SearchPrByBranch(path, branchName, gitToken string) (pr github.Issue, err e
 	}
 	if len(result.Issues) > 1 {
 		for i, issue := range result.Issues {
-			fmt.Println(issue.GetState())
 			if issue.GetState() == "open" {
 				return result.Issues[i], nil
 			}
