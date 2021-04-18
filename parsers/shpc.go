@@ -53,12 +53,19 @@ func (s SHPC) Encode(pkg Package) (result string, err error) {
 	if err != nil {
 		return result, err
 	}
+	result = result + string(output)
 
 	// encode aliases
 	aliasesMap, err := yaml.Marshal(&AliasMap{internal.Aliases})
+	if string(aliasesMap) != "" && string(aliasesMap) != "{}" {
+		result = result + string(aliasesMap)
+	}
 	aliasesStruct, err := yaml.Marshal(&AliasStruct{internal.AliasesStruct})
+	if string(aliasesStruct) != "" && string(aliasesStruct) != "{}" {
+		result = result + string(aliasesStruct)
+	}
 
-	return string(output) + string(aliasesMap) + string(aliasesStruct), err
+	return result, err
 }
 
 // ContainerSpec is a wrapper struct for a container.yaml
@@ -85,9 +92,9 @@ type AliasStruct struct {
 }
 
 type Alias struct {
-	Name    string `yaml:"name"`
-	Command string `yaml:"command"`
-	Options string `yaml:"options"`
+	Name    string `yaml:"name,omitempty"`
+	Command string `yaml:"command,omitempty"`
+	Options string `yaml:"options,omitempty"`
 }
 
 // AddVersion adds a tagged version to a container.
