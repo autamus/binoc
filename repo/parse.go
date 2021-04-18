@@ -2,6 +2,7 @@ package repo
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -47,7 +48,9 @@ func ParseDir(location string, output chan<- Result) {
 
 				result, err := parser.Decode(string(content))
 				if err != nil {
-					return err
+					fmt.Printf("Parse Error: Couldn't Read --> %s\n", path)
+					fmt.Printf("Error: %v\n", err)
+					continue
 				}
 
 				output <- Result{Parser: parser, Package: result, Path: path}
