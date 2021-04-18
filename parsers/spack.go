@@ -97,3 +97,9 @@ func (p *SpackPackage) GetName() string {
 func (p *SpackPackage) GetDependencies() []string {
 	return p.Data.Dependencies
 }
+
+// CompareResult compares the package to the result to
+// determine if the package is up-to or out-of-date.
+func (p *SpackPackage) CompareResult(input results.Result) int {
+	return input.Version.Compare(p.Data.LatestVersion.Value)
+}

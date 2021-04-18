@@ -1,6 +1,7 @@
 package update
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -28,7 +29,8 @@ func RunPollWorker(wg *sync.WaitGroup, input <-chan repo.Result, output chan<- r
 				result.Location, found = patchGitURL(url, result.Version)
 			}
 		}
-		if found && result.Version.Compare(app.Package.GetLatestVersion()) < 0 {
+		if found && app.Package.CompareResult(*result) < 0 {
+			fmt.Println("NOT UP TO DATE")
 			app.LookOutput = *result
 			output <- app
 		}

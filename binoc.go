@@ -65,73 +65,73 @@ func main() {
 
 		fmt.Printf("Updating %-30s", name+"...")
 
-		newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
-		commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
+		// newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
+		// commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
 
-		_, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
-		if err == nil {
-			fmt.Println("Skipped")
-			skipped++
-			continue
-		}
-		if err.Error() != "not found" {
-			log.Fatal(err)
-		}
+		// _, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
+		// if err == nil {
+		// 	fmt.Println("Skipped")
+		// 	skipped++
+		// 	continue
+		// }
+		// if err.Error() != "not found" {
+		// 	log.Fatal(err)
+		// }
 
-		mainBranchName, err := repo.GetBranchName(path)
+		// mainBranchName, err := repo.GetBranchName(path)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+
+		// err = repo.PullBranch(path, newBranchName)
+		// if err != nil {
+		// 	if err.Error() == "branch not found" {
+		// 		err = repo.CreateBranch(path, newBranchName)
+		// 	}
+		// 	if err != nil {
+		// 		log.Fatal(err)
+		// 	}
+		// }
+
+		// err = repo.SwitchBranch(path, newBranchName)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+
+		err := repo.UpdatePackage(app)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		err = repo.PullBranch(path, newBranchName)
-		if err != nil {
-			if err.Error() == "branch not found" {
-				err = repo.CreateBranch(path, newBranchName)
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
+		// err = repo.Commit(path, commitMessage, config.Global.Git.Name, config.Global.Git.Email)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 
-		err = repo.SwitchBranch(path, newBranchName)
-		if err != nil {
-			log.Fatal(err)
-		}
+		// err = repo.Push(path, config.Global.Git.Username, config.Global.Git.Token)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 
-		err = repo.UpdatePackage(app)
-		if err != nil {
-			log.Fatal(err)
-		}
+		// pr, err := repo.SearchPrByBranch(path, newBranchName, config.Global.Git.Token)
+		// if err != nil {
+		// 	if err.Error() == "not found" {
+		// 		err = repo.OpenPR(path, mainBranchName, commitMessage, config.Global.Git.Token)
+		// 	}
+		// 	if err != nil {
+		// 		log.Fatal(err)
+		// 	}
+		// } else {
+		// 	err = repo.UpdatePR(pr, path, commitMessage, config.Global.Git.Token)
+		// 	if err != nil {
+		// 		log.Fatal(err)
+		// 	}
+		// }
 
-		err = repo.Commit(path, commitMessage, config.Global.Git.Name, config.Global.Git.Email)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = repo.Push(path, config.Global.Git.Username, config.Global.Git.Token)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		pr, err := repo.SearchPrByBranch(path, newBranchName, config.Global.Git.Token)
-		if err != nil {
-			if err.Error() == "not found" {
-				err = repo.OpenPR(path, mainBranchName, commitMessage, config.Global.Git.Token)
-			}
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
-			err = repo.UpdatePR(pr, path, commitMessage, config.Global.Git.Token)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-
-		err = repo.SwitchBranch(path, mainBranchName)
-		if err != nil {
-			log.Fatal(err)
-		}
+		// err = repo.SwitchBranch(path, mainBranchName)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
 
 		fmt.Println("Done")
 		updated++
