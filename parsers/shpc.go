@@ -41,13 +41,13 @@ type ContainerSpec struct {
 	Name        string            `yaml:"name,omitempty"`
 	Docker      string            `yaml:"docker,omitempty"`
 	Gh          string            `yaml:"gh,omitempty"`
-	Url         string            `yaml:"url"`
+	Url         string            `yaml:"url,omitempty"`
 	Maintainer  string            `yaml:"maintainer"`
 	Description string            `yaml:"description"`
 	Latest      map[string]string `yaml:"latest"`
 	Versions    map[string]string `yaml:"tags"`
-	Aliases     map[string]string `yaml:"aliases"`
-	Filter      []string          `yaml:"filter"`
+	Aliases     map[string]string `yaml:"aliases,omitempty"`
+	Filter      []string          `yaml:"filter,omitempty"`
 }
 
 // AddVersion adds a tagged version to a container.
