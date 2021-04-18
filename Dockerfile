@@ -23,7 +23,8 @@ RUN apk add --no-cache \
     binutils \
     musl-dev \
     binutils-gold \
-    musl-dev
+    musl-dev \
+    libc-dev
 
 # Build the Go app
 RUN go build -o binoc .
