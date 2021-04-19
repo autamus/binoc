@@ -10,6 +10,7 @@ import (
 	"github.com/autamus/binoc/config"
 	"github.com/autamus/binoc/repo"
 	"github.com/autamus/binoc/update"
+	"github.com/go-git/go-git/v5"
 )
 
 func main() {
@@ -41,6 +42,12 @@ func main() {
 
 	// Parse Config Value into list of parser names
 	repo.Init(strings.Split(config.Global.Parsers.Loaded, ","))
+
+	// Pull Git Repository Updates
+	err := repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
+	if err != nil && err != git.NoErrAlreadyUpToDate {
+		printError(err)
+	}
 
 	// Begin parsing the repository matching file extentions to parsers.
 	go repo.ParseDir(path, relay)
