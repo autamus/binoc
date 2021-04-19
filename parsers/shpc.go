@@ -150,13 +150,19 @@ func (s *ContainerSpec) GetDependencies() []string {
 func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
 	outOfDate = false
 	url := s.GetURL()
+	docker := strings.HasPrefix(url, "docker://")
 
 	// Check for new latest version
 	result, found := lookout.CheckUpdate(url)
-	if found {
+	if found && docker {
 		latestKey := s.GetLatestVersion().String()
 		latest := version.Version{latestKey + "@" + s.Latest[latestKey]}
-		new := version.Version{result.Version.String() + "@" + result.Name}
+		var new version.Version
+		if docker {
+			new = version.Version{result.Version.String() + "@" + result.Name}
+		} else {
+			new = version.Version{result.Version.String() + "@" + s.Name}
+		}
 		if latest.String() != new.String() {
 			outOfDate = true
 			s.AddVersion(*result)
@@ -164,21 +170,23 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
 		}
 	}
 
-	// Iteratively check previous labels for digest updates
-	var baseUrl string
-	if len(s.Filter) > 0 {
-		baseUrl = strings.TrimSuffix(url, ":"+s.Filter[0])
-	} else {
-		baseUrl = url
-	}
-	for tag, digest := range s.Versions {
-		result, found := lookout.CheckUpdate(baseUrl + ":" + tag)
-		if found {
-			if digest != result.Name {
-				outOfDate = true
-				s.Versions[tag] = result.Name
-				if output.Version.String() == "" {
-					output = result
+	if docker {
+		// Iteratively check previous labels for digest updates
+		var baseUrl string
+		if len(s.Filter) > 0 {
+			baseUrl = strings.TrimSuffix(url, ":"+s.Filter[0])
+		} else {
+			baseUrl = url
+		}
+		for tag, digest := range s.Versions {
+			result, found := lookout.CheckUpdate(baseUrl + ":" + tag)
+			if found {
+				if digest != result.Name {
+					outOfDate = true
+					s.Versions[tag] = result.Name
+					if output == nil {
+						output = result
+					}
 				}
 			}
 		}
