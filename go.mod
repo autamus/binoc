@@ -6,7 +6,7 @@ require (
 	github.com/DataDrake/cuppa v1.1.1-0.20210306020014-480be4e72c83
 	github.com/Microsoft/go-winio v0.4.17 // indirect
 	github.com/alecbcs/lookout v1.2.2
-	github.com/autamus/go-parspack v0.1.7
+	github.com/autamus/go-parspack v0.1.8
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-github v17.0.0+incompatible

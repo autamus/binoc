@@ -88,8 +88,8 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkY
 github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
 github.com/autamus/cuppa v1.1.1-0.20210418064714-36f7ae9631fa h1:hhQGiAuYqJVVCqTIHLmC/yBS/dbbHBVd1x9/mpW6mkE=
 github.com/autamus/cuppa v1.1.1-0.20210418064714-36f7ae9631fa/go.mod h1:T7vjPzpTUpmlRe3ItAclpTndAkGZCZMSJufflIUuFmg=
-github.com/autamus/go-parspack v0.1.7 h1:f05x97P/12+HihD74HsivGVW6lgSOph7RxMD8iHZXVk=
-github.com/autamus/go-parspack v0.1.7/go.mod h1:UH8N5nlSIoTi/90N+Hq+dfk0EqLkXk9bVpUhfRu6tKU=
+github.com/autamus/go-parspack v0.1.8 h1:R5/ckdkSUXG5/gZOJfB0BKIEdFC8lyW9xaxMvMmrcss=
+github.com/autamus/go-parspack v0.1.8/go.mod h1:UH8N5nlSIoTi/90N+Hq+dfk0EqLkXk9bVpUhfRu6tKU=
 github.com/aws/aws-sdk-go v1.15.11/go.mod h1:mFuSZ37Z9YOHbQEwBWztmVzqXrEkub65tZoCYDt7FT0=
 github.com/beorn7/perks v0.0.0-20160804104726-4c0e84591b9a/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
