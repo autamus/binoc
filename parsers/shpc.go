@@ -1,8 +1,11 @@
 package parsers
 
 import (
+	"strings"
+
 	"github.com/DataDrake/cuppa/results"
 	"github.com/DataDrake/cuppa/version"
+	lookout "github.com/alecbcs/lookout/update"
 	"gopkg.in/yaml.v2"
 )
 
@@ -109,8 +112,8 @@ func (s *ContainerSpec) AddVersion(input results.Result) (err error) {
 
 // GetLatestVersion returns the latest known tag of the container.
 func (s *ContainerSpec) GetLatestVersion() (result version.Version) {
-	for k, v := range s.Latest {
-		return version.Version{k + "@" + v}
+	for k := range s.Latest {
+		return version.Version{k}
 	}
 	return
 }
@@ -143,12 +146,43 @@ func (s *ContainerSpec) GetDependencies() []string {
 	return []string{}
 }
 
-// CompareResult for containers compares the sha's to
-// see if they are the same or not.
-func (s *ContainerSpec) CompareResult(input results.Result) int {
-	new := version.Version{input.Version.String() + "@" + input.Name}
-	if s.GetLatestVersion().String() != new.String() {
-		return -1
+// CheckUpdate checks for an update to the container
+func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
+	outOfDate = false
+	url := s.GetURL()
+
+	// Check for new latest version
+	result, found := lookout.CheckUpdate(url)
+	if found {
+		latestKey := s.GetLatestVersion().String()
+		latest := version.Version{latestKey + "@" + s.Latest[latestKey]}
+		new := version.Version{result.Version.String() + "@" + result.Name}
+		if latest.String() != new.String() {
+			outOfDate = true
+			s.AddVersion(*result)
+			output = result
+		}
 	}
-	return 0
+
+	// Iteratively check previous labels for digest updates
+	var baseUrl string
+	if len(s.Filter) > 0 {
+		baseUrl = strings.TrimSuffix(url, ":"+s.Filter[0])
+	} else {
+		baseUrl = url
+	}
+	for tag, digest := range s.Versions {
+		result, found := lookout.CheckUpdate(baseUrl + ":" + tag)
+		if found {
+			if digest != result.Name {
+				outOfDate = true
+				s.Versions[tag] = result.Name
+				if output.Version.String() == "" {
+					output = result
+				}
+			}
+		}
+	}
+
+	return outOfDate, output
 }

@@ -1,12 +1,9 @@
 package update
 
 import (
-	"net/http"
-	"regexp"
-	"strings"
+	"fmt"
 	"sync"
 
-	"github.com/DataDrake/cuppa/version"
 	lookout "github.com/alecbcs/lookout/update"
 	"github.com/autamus/binoc/repo"
 )
@@ -20,33 +17,13 @@ func Init(token string) {
 // provided package on the input channel.
 func RunPollWorker(wg *sync.WaitGroup, input <-chan repo.Result, output chan<- repo.Result) {
 	for app := range input {
-		url := app.Package.GetURL()
-		result, found := lookout.CheckUpdate(url)
-		if !found {
-			result, found = lookout.CheckUpdate(app.Package.GetGitURL())
-			if found {
-				result.Location, found = patchGitURL(url, result.Version)
-			}
-		}
-		if found && app.Package.CompareResult(*result) < 0 {
+		fmt.Println(app.Package.GetName())
+		fmt.Println(app.Package.GetLatestVersion())
+		outOfDate, result := app.Package.CheckUpdate()
+		if outOfDate {
 			app.LookOutput = *result
 			output <- app
 		}
 	}
 	wg.Done()
-}
-
-// patchGitURL attempts to find an updated release url based on the version from the git url.
-func patchGitURL(url string, input version.Version) (output string, found bool) {
-	vexp := regexp.MustCompile(`([0-9]{1,4}[.])+[0-9,a-d]{1,4}`)
-	output = vexp.ReplaceAllString(url, strings.Join(input, "."))
-
-	resp, err := http.Head(output)
-	if err != nil {
-		return
-	}
-	if resp.StatusCode != http.StatusOK {
-		return "", false
-	}
-	return output, true
 }

@@ -73,16 +73,10 @@ func main() {
 		newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
 		commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
 
-		// Pull latest changes to repo before updating package.
-		// This fixes fast-forward errors.
-		err := repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
-		if err != nil && err.Error() != "already up-to-date" {
-			log.Fatal(err)
-		}
-
+		// Search for previous open pull requests so that we don't create duplicates.
 		pr, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
 		if err != nil && err.Error() != "not found" {
-			log.Fatal(err)
+			printError(err)
 		}
 		if err == nil {
 			blacklistFound := false
@@ -97,69 +91,74 @@ func main() {
 				continue
 			}
 		}
-
+		// Store the name of the "main" branch that we
+		// started on.
 		mainBranchName, err := repo.GetBranchName(path)
 		if err != nil {
-			log.Fatal(err)
+			printError(err)
 		}
 
+		// Pull an existing branch to update if possible.
 		err = repo.PullBranch(path, newBranchName)
 		if err != nil {
 			if err.Error() == "branch not found" {
 				err = repo.CreateBranch(path, newBranchName)
 			}
 			if err != nil {
-				log.Fatal(err)
+				printError(err)
 			}
 		}
 
 		err = repo.SwitchBranch(path, newBranchName)
 		if err != nil {
-			log.Fatal(err)
+			printError(err)
 		}
 
 		err = repo.UpdatePackage(app)
 		if err != nil {
-			log.Fatal(err)
-		}
-
-		// Pull latest changes to repo before updating package.
-		// This fixes fast-forward errors.
-		err = repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
-		if err != nil && err.Error() != "already up-to-date" {
-			log.Fatal(err)
+			printError(err)
 		}
 
 		err = repo.Commit(path, commitMessage, config.Global.Git.Name, config.Global.Git.Email)
 		if err != nil {
-			log.Fatal(err)
+			printError(err)
 		}
 
 		err = repo.Push(path, config.Global.Git.Username, config.Global.Git.Token)
 		if err != nil {
-			log.Fatal(err)
+			if strings.HasPrefix(err.Error(), "non-fast-forward") {
+				// Pull latest changes to repo and attempt to push again.
+				err = repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
+				if err != nil && err.Error() != "already up-to-date" {
+					printError(err)
+				}
+				err = repo.Push(path, config.Global.Git.Username, config.Global.Git.Token)
+			}
+			if err != nil {
+				printError(err)
+			}
 		}
 
 		pr, err = repo.SearchPrByBranch(path, newBranchName, config.Global.Git.Token)
 		if err == nil && *pr.State == "open" {
 			err = repo.UpdatePR(pr, path, commitMessage, config.Global.Git.Token)
 			if err != nil {
-				log.Fatal(err)
+				printError(err)
 			}
 		} else {
 			if err != nil && err.Error() != "not found" {
-				log.Fatal(err)
+				printError(err)
 			}
 			err = repo.OpenPR(path, mainBranchName, commitMessage, config.Global.Git.Token)
 			if err != nil {
-				log.Fatal(err)
+				printError(err)
 			}
 
 		}
 
 		err = repo.SwitchBranch(path, mainBranchName)
 		if err != nil {
-			log.Fatal(err)
+			printError(err)
 		}
 
 		fmt.Println("Done")
@@ -171,4 +170,9 @@ func main() {
 	fmt.Printf("%-5d Packages Updated\n", updated)
 	fmt.Printf("%-5d Packages Skipped\n", skipped)
 	fmt.Println()
+}
+
+func printError(err error) {
+	fmt.Println("Error")
+	log.Fatal(err)
 }

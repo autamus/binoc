@@ -24,7 +24,7 @@ type Package interface {
 	GetName() (result string)
 	GetDependencies() (results []string)
 	GetGitURL() (result string)
-	CompareResult(new results.Result) int
+	CheckUpdate() (outOfDate bool, result *results.Result)
 }
 
 type entry struct {

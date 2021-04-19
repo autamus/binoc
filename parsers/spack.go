@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"github.com/DataDrake/cuppa/results"
 	"github.com/DataDrake/cuppa/version"
+	lookout "github.com/alecbcs/lookout/update"
 	"github.com/autamus/go-parspack"
 	"github.com/autamus/go-parspack/pkg"
 )
@@ -98,8 +101,35 @@ func (p *SpackPackage) GetDependencies() []string {
 	return p.Data.Dependencies
 }
 
-// CompareResult compares the package to the result to
-// determine if the package is up-to or out-of-date.
-func (p *SpackPackage) CompareResult(input results.Result) int {
-	return input.Version.Compare(p.Data.LatestVersion.Value)
+// CheckUpdate checks for an update to source code project
+// of the current Spack package.
+func (p *SpackPackage) CheckUpdate() (outofDate bool, result *results.Result) {
+	url := p.GetURL()
+	result, found := lookout.CheckUpdate(url)
+	if !found {
+		result, found = lookout.CheckUpdate(p.GetGitURL())
+		if found {
+			result.Location, found = patchGitURL(url, result.Version)
+		}
+	}
+	outOfDate := found && p.Data.LatestVersion.Value.Less(result.Version)
+	if outOfDate {
+		p.AddVersion(*result)
+	}
+	return outOfDate, result
+}
+
+// patchGitURL attempts to find an updated release url based on the version from the git url.
+func patchGitURL(url string, input version.Version) (output string, found bool) {
+	vexp := regexp.MustCompile(`([0-9]{1,4}[.])+[0-9,a-d]{1,4}`)
+	output = vexp.ReplaceAllString(url, strings.Join(input, "."))
+
+	resp, err := http.Head(output)
+	if err != nil {
+		return
+	}
+	if resp.StatusCode != http.StatusOK {
+		return "", false
+	}
+	return output, true
 }
