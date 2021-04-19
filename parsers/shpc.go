@@ -186,3 +186,7 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
 
 	return outOfDate, output
 }
+
+func (s *ContainerSpec) UpdatePackage(input results.Result) (err error) {
+	return nil
+}

@@ -112,11 +112,12 @@ func (p *SpackPackage) CheckUpdate() (outofDate bool, result *results.Result) {
 			result.Location, found = patchGitURL(url, result.Version)
 		}
 	}
-	outOfDate := found && p.Data.LatestVersion.Value.Less(result.Version)
-	if outOfDate {
-		p.AddVersion(*result)
-	}
+	outOfDate := found && result.Version.Less(p.Data.LatestVersion.Value)
 	return outOfDate, result
+}
+
+func (p *SpackPackage) UpdatePackage(input results.Result) (err error) {
+	return p.AddVersion(input)
 }
 
 // patchGitURL attempts to find an updated release url based on the version from the git url.

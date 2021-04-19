@@ -16,6 +16,11 @@ func UpdatePackage(pkg Result) (err error) {
 	}
 	defer file.Close()
 
+	err = pkg.Package.UpdatePackage(pkg.LookOutput)
+	if err != nil {
+		return err
+	}
+
 	result, err := pkg.Parser.Encode(pkg.Package)
 	if err != nil {
 		return err

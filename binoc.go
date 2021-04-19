@@ -126,14 +126,6 @@ func main() {
 
 		err = repo.Push(path, config.Global.Git.Username, config.Global.Git.Token)
 		if err != nil {
-			if strings.HasPrefix(err.Error(), "non-fast-forward") {
-				// Pull latest changes to repo and attempt to push again.
-				err = repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
-				if err != nil && err.Error() != "already up-to-date" {
-					printError(err)
-				}
-				err = repo.Push(path, config.Global.Git.Username, config.Global.Git.Token)
-			}
 			if err != nil {
 				printError(err)
 			}

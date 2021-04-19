@@ -41,12 +41,7 @@ func OpenPR(path, mainBranch, prTitle, gitToken string) (err error) {
 
 	client := github.NewClient(tc)
 
-	r, err := git.PlainOpen(path)
-	if err != nil {
-		return err
-	}
-
-	h, err := r.Head()
+	branchName, err := GetBranchName(path)
 	if err != nil {
 		return err
 	}
@@ -54,7 +49,7 @@ func OpenPR(path, mainBranch, prTitle, gitToken string) (err error) {
 	pr := &github.NewPullRequest{
 		Title:               github.String(prTitle),
 		Body:                github.String(prTitle),
-		Head:                github.String(strings.TrimPrefix(h.Name().String(), "refs/heads/")),
+		Head:                github.String(branchName),
 		Base:                github.String(mainBranch),
 		MaintainerCanModify: github.Bool(true),
 	}

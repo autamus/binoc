@@ -13,14 +13,13 @@ func Push(path string, gitUsername string, gitToken string) (err error) {
 		return err
 	}
 
-	branchName, err := GetBranchName(path)
+	h, err := r.Head()
 	if err != nil {
 		return err
 	}
-
 	// Generate <src>:<dest> reference string
-	refStr := "refs/heads/" + branchName + ":refs/remotes/origin/" + branchName
-
+	refStr := "+" + h.Name().String() + ":" + h.Name().String()
+	// Push Branch to Origin
 	err = r.Push(&git.PushOptions{
 		RefSpecs: []config.RefSpec{config.RefSpec(refStr)},
 		Auth: &http.BasicAuth{

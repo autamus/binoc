@@ -25,6 +25,7 @@ type Package interface {
 	GetDependencies() (results []string)
 	GetGitURL() (result string)
 	CheckUpdate() (outOfDate bool, result *results.Result)
+	UpdatePackage(input results.Result) (err error)
 }
 
 type entry struct {
