@@ -1,7 +1,6 @@
 package update
 
 import (
-	"fmt"
 	"sync"
 
 	lookout "github.com/alecbcs/lookout/update"
@@ -17,8 +16,6 @@ func Init(token string) {
 // provided package on the input channel.
 func RunPollWorker(wg *sync.WaitGroup, input <-chan repo.Result, output chan<- repo.Result) {
 	for app := range input {
-		fmt.Println(app.Package.GetName())
-		fmt.Println(app.Package.GetLatestVersion())
 		outOfDate, result := app.Package.CheckUpdate()
 		if outOfDate {
 			app.LookOutput = *result
