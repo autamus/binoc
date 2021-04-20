@@ -5,8 +5,8 @@ go 1.16
 require (
 	github.com/DataDrake/cuppa v1.1.1-0.20210306020014-480be4e72c83
 	github.com/Microsoft/go-winio v0.4.17 // indirect
-	github.com/alecbcs/lookout v1.2.3
-	github.com/autamus/go-parspack v0.1.8
+	github.com/alecbcs/lookout v1.2.4
+	github.com/autamus/go-parspack v0.1.10
 	github.com/go-git/go-git/v5 v5.3.0
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-github v17.0.0+incompatible
@@ -21,4 +21,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-replace github.com/DataDrake/cuppa => github.com/autamus/cuppa v1.1.1-0.20210420010740-8b8b02726783
+replace github.com/DataDrake/cuppa => github.com/autamus/cuppa v1.1.1-0.20210420012628-a8434f2336d7
