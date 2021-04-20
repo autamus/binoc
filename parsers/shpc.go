@@ -122,11 +122,11 @@ func (s *ContainerSpec) GetLatestVersion() (result version.Version) {
 func (s *ContainerSpec) GetURL() (result string) {
 	if s.Docker != "" {
 		result = "docker://" + s.Docker
+		if len(s.Filter) > 0 {
+			result = result + ":" + s.Filter[0]
+		}
 	} else {
 		result = "https://github.com/" + s.Gh
-	}
-	if len(s.Filter) > 0 {
-		result = result + ":" + s.Filter[0]
 	}
 	return result
 }
@@ -154,7 +154,7 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
 
 	// Check for new latest version
 	result, found := lookout.CheckUpdate(url)
-	if found && docker {
+	if found {
 		latestKey := s.GetLatestVersion().String()
 		latest := version.Version{latestKey + "@" + s.Latest[latestKey]}
 		var new version.Version
@@ -186,6 +186,9 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
 					s.Versions[tag] = result.Name
 					if output == nil {
 						output = result
+					}
+					if s.Latest[tag] != "" {
+						s.Latest[tag] = result.Name
 					}
 				}
 			}
