@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/autamus/binoc/config"
 	"github.com/autamus/binoc/repo"
@@ -162,6 +163,7 @@ func main() {
 
 		fmt.Println("Done")
 		updated++
+		time.Sleep(1 * time.Second)
 	}
 	fmt.Println()
 	fmt.Println("[Scan Results]")
