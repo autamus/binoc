@@ -163,7 +163,7 @@ func main() {
 
 		fmt.Println("Done")
 		updated++
-		time.Sleep(1 * time.Second)
+		time.Sleep(5 * time.Second)
 	}
 	fmt.Println()
 	fmt.Println("[Scan Results]")
