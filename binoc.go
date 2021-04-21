@@ -131,7 +131,7 @@ func main() {
 			}
 		}
 
-		// Updating the package is run regardless of skip_pr
+		// Updating the package is run regardless of pr_skip
 		err = repo.UpdatePackage(app)
 		if err != nil {
 			printError(err)
@@ -178,7 +178,11 @@ func main() {
 
 		fmt.Println("Done")
 		updated++
-		time.Sleep(5 * time.Second)
+
+		// We only need to sleep if we are submitting PRs
+		if config.Global.PR.Skip == "false" {
+			time.Sleep(5 * time.Second)
+		}
 	}
 	fmt.Println()
 	fmt.Println("[Scan Results]")
