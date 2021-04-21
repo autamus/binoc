@@ -78,53 +78,63 @@ func main() {
 
 		fmt.Printf("Updating %-30s", name+"...")
 
-		newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
-		commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
+		// Only run git checkouts, commits, if binoc is managing PRs
+		if config.Global.PR.Skip == "false" {
 
-		// Search for previous open pull requests so that we don't create duplicates.
-		pr, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
-		if err != nil && err.Error() != "not found" {
-			printError(err)
-		}
-		if err == nil {
-			blacklistFound := false
-			for _, label := range pr.Labels {
-				if *label.Name == config.Global.PR.IgnoreLabel {
-					blacklistFound = true
+			newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
+			commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
+
+			// Search for previous open pull requests so that we don't create duplicates.
+			pr, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
+			if err != nil && err.Error() != "not found" {
+				printError(err)
+			}
+			if err == nil {
+				blacklistFound := false
+				for _, label := range pr.Labels {
+					if *label.Name == config.Global.PR.IgnoreLabel {
+						blacklistFound = true
+					}
+				}
+				if *pr.State == "open" || blacklistFound {
+					fmt.Println("Skipped")
+					skipped++
+					continue
 				}
 			}
-			if *pr.State == "open" || blacklistFound {
-				fmt.Println("Skipped")
-				skipped++
-				continue
+			// Store the name of the "main" branch that we
+			// started on.
+			mainBranchName, err := repo.GetBranchName(path)
+			if err != nil {
+				printError(err)
 			}
-		}
-		// Store the name of the "main" branch that we
-		// started on.
-		mainBranchName, err := repo.GetBranchName(path)
-		if err != nil {
-			printError(err)
-		}
 
-		// Pull an existing branch to update if possible.
-		err = repo.PullBranch(path, newBranchName)
-		if err != nil {
-			if err.Error() == "branch not found" {
-				err = repo.CreateBranch(path, newBranchName)
+			// Pull an existing branch to update if possible.
+			err = repo.PullBranch(path, newBranchName)
+			if err != nil {
+				if err.Error() == "branch not found" {
+					err = repo.CreateBranch(path, newBranchName)
+				}
+				if err != nil {
+					printError(err)
+				}
 			}
+
+			err = repo.SwitchBranch(path, newBranchName)
 			if err != nil {
 				printError(err)
 			}
 		}
 
-		err = repo.SwitchBranch(path, newBranchName)
+		// Updating the package is run regardless of skip_pr
+		err = repo.UpdatePackage(app)
 		if err != nil {
 			printError(err)
 		}
 
-		err = repo.UpdatePackage(app)
-		if err != nil {
-			printError(err)
+		// If we are not managing prs, continue in loop to update
+		if config.Global.PR.Skip == "true" {
+			continue
 		}
 
 		err = repo.Commit(path, commitMessage, config.Global.Git.Name, config.Global.Git.Email)
