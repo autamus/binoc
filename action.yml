@@ -28,7 +28,7 @@ inputs:
   pr_skip:
     description: "Skip checking out branches, commits, and pull requests."
     required: false
-    default: 'true'
+    default: 'false'
   general_action:
     description: 'Tells Binoc if it is running as a GitHub action or not.'
     required: false
