@@ -12,7 +12,9 @@ Binoc is an automatic software maintainer in a box. It builds off of other proje
 (Others Comming Soon)
 
 ## Usage
-Binoc can be run as either a GitHub Action or a Docker Container
+Binoc can be run as either a GitHub Action or a Docker Container. You can have binoc
+manage your pull requests (the default) or set `skip_pr` to "true" to manage them on
+your own.
 
 #### Automatic Daily Scan of the Repository containing Spack Packages at 7am PST.
 ###### .github/workflows/binoc.yaml
@@ -43,9 +45,11 @@ jobs:
           repo_path: '/'
           parsers_loaded: 'spack'
           general_action: 'true'
+          # pr_skip: 'true'   # Disable Binoc's ability to create pull requests.
 ```
 
 ## Contributing
+
 If you are interested in contributing to Binoc, we love pull requests! If you've got a favorite packaging format, we're looking for help writing more package parsers! Checkout [parsers/](https://github.com/autamus/binoc/tree/main/parsers) for examples on how to get started and implement the parser interface.
 
 ## Building Binoc From Source
