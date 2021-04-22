@@ -45,7 +45,7 @@ jobs:
           repo_path: '/'
           parsers_loaded: 'spack'
           general_action: 'true'
-          pr_skip: 'false'   # set to 'false' to manage your own commits.
+          pr_skip: 'true'   # set to 'false' for binoc to manage commits / PRs
 ```
 
 ## Contributing

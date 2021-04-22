@@ -26,9 +26,9 @@ inputs:
     required: false
     default: 'spack'
   pr_skip:
-    description: "Skip checking out branches, commits, and pull requests. Set to string 'true' to skip."
+    description: "Skip checking out branches, commits, and pull requests."
     required: false
-    default: 'false'
+    default: 'true'
   general_action:
     description: 'Tells Binoc if it is running as a GitHub action or not.'
     required: false
@@ -39,8 +39,7 @@ inputs:
     default: 'binoc/'
 runs:
   using: 'docker'
-  image: "Dockerfile"
-#  image: 'docker://ghcr.io/autamus/binoc:latest'
+  image: 'docker://ghcr.io/autamus/binoc:latest'
 
 branding:
   icon: 'activity'
