@@ -45,7 +45,7 @@ jobs:
           repo_path: '/'
           parsers_loaded: 'spack'
           general_action: 'true'
-          pr_skip: 'true'   # set to 'false' for binoc to manage commits / PRs
+          # pr_skip: 'true'   # Disable Binoc's ability to create pull requests.
 ```
 
 ## Contributing

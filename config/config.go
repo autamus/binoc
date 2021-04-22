@@ -42,7 +42,7 @@ type branch struct {
 
 type pr struct {
 	IgnoreLabel string
-	Skip string
+	Skip        string
 }
 
 var (
@@ -60,7 +60,7 @@ func defaultConfig() {
 	Global.Parsers.Loaded = "spack,shpc"
 	Global.Branch.Prefix = "binoc/"
 	Global.PR.IgnoreLabel = "binoc-blacklist"
-	Global.PR.Skip = "false"
+	Global.PR.Skip = "true"
 }
 
 func parseConfigEnv() {
