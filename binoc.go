@@ -92,11 +92,11 @@ func main() {
 		// Only run git checkouts, commits, if binoc is managing PRs
 		if config.Global.PR.Skip == "false" {
 
-			newBranchName := fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
-			commitMessage := fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
+			newBranchName = fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
+			commitMessage = fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
 
 			// Search for previous open pull requests so that we don't create duplicates.
-			pr, err := repo.SearchPR(path, commitMessage, config.Global.Git.Token)
+			pr, err = repo.SearchPR(path, commitMessage, config.Global.Git.Token)
 			if err != nil && err.Error() != "not found" {
 				printError(err)
 			}
@@ -166,9 +166,7 @@ func main() {
 				if err != nil {
 					printError(err)
 				}
-
 			}
-
 			err = repo.SwitchBranch(path, mainBranchName)
 			if err != nil {
 				printError(err)

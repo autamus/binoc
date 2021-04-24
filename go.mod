@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/DataDrake/cuppa v1.1.1-0.20210306020014-480be4e72c83
-	github.com/Microsoft/go-winio v0.4.19 // indirect
+	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/alecbcs/lookout v1.2.5
 	github.com/autamus/go-parspack v0.1.11
 	github.com/containers/image/v5 v5.11.1 // indirect
@@ -25,9 +25,9 @@ require (
 	github.com/prometheus/common v0.21.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b // indirect
-	golang.org/x/net v0.0.0-20210421230115-4e50805a0758 // indirect
+	golang.org/x/net v0.0.0-20210423184538-5f58ad60dda6 // indirect
 	golang.org/x/oauth2 v0.0.0-20210413134643-5e61552d6c78
-	golang.org/x/sys v0.0.0-20210421221651-33663a62ff08 // indirect
+	golang.org/x/sys v0.0.0-20210423185535-09eb48e85fd7 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
