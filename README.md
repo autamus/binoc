@@ -72,7 +72,7 @@ You can then test binoc on a repository by way of exporting environment variable
 command. For example:
 
 ```bash
-INPUT_REPO_PATH=/path/to/test/ INPUT_PARSERS_LOADED=shpc INPUT_GENERAL_ACTION=false INPUT_GIT_TOKEN=ghp_xxxx go run binoc.go
+BINOC_REPO_PATH=/path/to/test/ BINOC_PARSERS_LOADED=shpc BINOC_GIT_TOKEN=ghp_xxxx go run binoc.go
 ```
 
 ## License
