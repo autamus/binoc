@@ -68,6 +68,13 @@ If you are interested in contributing to Binoc, we love pull requests! If you've
 3. `go build binoc.go` <-- will build binoc into an executable on your machine.
 
 
+You can then test binoc on a repository by way of exporting environment variables for the
+command. For example:
+
+```bash
+BINOC_REPO_PATH=/path/to/test/ BINOC_PARSERS_LOADED=shpc BINOC_GIT_TOKEN=ghp_xxxx go run binoc.go
+```
+
 ## License
 
 Copyright 2021 Alec Scott & Autamus <hi@alecbcs.com>

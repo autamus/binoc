@@ -161,7 +161,13 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
 		if docker {
 			new = version.Version{result.Version.String() + "@" + result.Name}
 		} else {
-			new = version.Version{result.Version.String() + "@" + s.Name}
+			new = version.Version{latestKey + "@" + result.Version.String()}
+
+			// A gh release expects the "tag" as the recipe extension
+			result.Name = result.Version.String()
+
+			// And the digest as the release version
+			result.Version = version.NewVersion(latestKey)
 		}
 		if latest.String() != new.String() {
 			outOfDate = true
