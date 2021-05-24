@@ -134,7 +134,6 @@ func main() {
 				printError(err)
 			}
 		}
-		fmt.Println()
 
 		// Updating the package is run regardless of pr_skip
 		err = repo.UpdatePackage(app)
