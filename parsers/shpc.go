@@ -60,6 +60,9 @@ func (s SHPC) Encode(pkg Package) (result string, err error) {
 
 	// encode aliases
 	aliasesMap, err := yaml.Marshal(&AliasMap{internal.Aliases})
+	if err != nil {
+		return result, err
+	}
 	if string(aliasesMap) != "" && string(aliasesMap) != "{}\n" {
 		result = result + string(aliasesMap)
 	}
@@ -147,14 +150,15 @@ func (s *ContainerSpec) GetDependencies() []string {
 }
 
 // CheckUpdate checks for an update to the container
-func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
+func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output results.Result) {
 	outOfDate = false
 	url := s.GetURL()
 	docker := strings.HasPrefix(url, "docker://")
 
 	// Check for new latest version
-	result, found := lookout.CheckUpdate(url)
+	out, found := lookout.CheckUpdate(url)
 	if found {
+		result := *out
 		latestKey := s.GetLatestVersion().String()
 		latest := version.Version{latestKey + "@" + s.Latest[latestKey]}
 		var new version.Version
@@ -171,7 +175,7 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
 		}
 		if latest.String() != new.String() {
 			outOfDate = true
-			s.AddVersion(*result)
+			s.AddVersion(result)
 			output = result
 		}
 	}
@@ -185,12 +189,13 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output *results.Result) {
 			baseUrl = url
 		}
 		for tag, digest := range s.Versions {
-			result, found := lookout.CheckUpdate(baseUrl + ":" + tag)
+			out, found := lookout.CheckUpdate(baseUrl + ":" + tag)
 			if found {
+				result := *out
 				if digest != result.Name {
 					outOfDate = true
 					s.Versions[tag] = result.Name
-					if output == nil {
+					if output.Location == "" {
 						output = result
 					}
 					if s.Latest[tag] != "" {

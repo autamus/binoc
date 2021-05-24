@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/autamus/binoc/config"
+	"github.com/autamus/binoc/parsers"
 	"github.com/autamus/binoc/repo"
 	"github.com/autamus/binoc/update"
 	"github.com/go-git/go-git/v5"
@@ -44,6 +45,9 @@ func main() {
 
 	// Parse Config Value into list of parser names
 	repo.Init(strings.Split(config.Global.Parsers.Loaded, ","))
+
+	// Set Config Value to Spack Parser
+	parsers.SpackUpstreamLink = config.Global.Repo.SpackUpstreamLink
 
 	// Pull Git Repository Updates
 	err := repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
@@ -130,6 +134,7 @@ func main() {
 				printError(err)
 			}
 		}
+		fmt.Println()
 
 		// Updating the package is run regardless of pr_skip
 		err = repo.UpdatePackage(app)

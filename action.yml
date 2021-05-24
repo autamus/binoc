@@ -37,6 +37,10 @@ inputs:
     description: 'Tells Binoc what prefix to use when creating branches.'
     required: false
     default: 'binoc/'
+  repo_spackupstreamlink:
+    description: 'Tells Binoc where to look for upstream spack package updates.'
+    required: false
+    default: ''
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'

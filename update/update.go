@@ -18,7 +18,7 @@ func RunPollWorker(wg *sync.WaitGroup, input <-chan repo.Result, output chan<- r
 	for app := range input {
 		outOfDate, result := app.Package.CheckUpdate()
 		if outOfDate {
-			app.LookOutput = *result
+			app.LookOutput = result
 			output <- app
 		}
 	}

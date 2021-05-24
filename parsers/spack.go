@@ -7,12 +7,17 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/DataDrake/cuppa/results"
 	"github.com/DataDrake/cuppa/version"
 	lookout "github.com/alecbcs/lookout/update"
 	"github.com/autamus/go-parspack"
 	"github.com/autamus/go-parspack/pkg"
+)
+
+var (
+	SpackUpstreamLink string
 )
 
 // Spack is a wrapper struct for the Spack Parser
@@ -103,21 +108,70 @@ func (p *SpackPackage) GetDependencies() []string {
 
 // CheckUpdate checks for an update to source code project
 // of the current Spack package.
-func (p *SpackPackage) CheckUpdate() (outofDate bool, result *results.Result) {
+func (p *SpackPackage) CheckUpdate() (outofDate bool, result results.Result) {
 	url := p.GetURL()
-	result, found := lookout.CheckUpdate(url)
+	out, found := lookout.CheckUpdate(url)
 	if !found {
-		result, found = lookout.CheckUpdate(p.GetGitURL())
+		out, found = lookout.CheckUpdate(p.GetGitURL())
 		if found {
 			result.Location, found = patchGitURL(url, result.Version)
 		}
 	}
+	if found {
+		result = *out
+	}
+
+	// Check for update from Spack
+	if SpackUpstreamLink != "" {
+		concreteLink := strings.ReplaceAll(SpackUpstreamLink, "{{package}}", toHyphenCase(p.GetName()))
+		resp, err := http.Get(concreteLink)
+		if err != nil || resp.StatusCode != 200 {
+			goto END
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			goto END
+		}
+		spackParser := Spack{}
+		newPkg, err := spackParser.Decode(string(body))
+		if err != nil {
+			goto END
+		}
+		if newPkg.GetLatestVersion().Compare(p.GetLatestVersion()) < 0 {
+			// Test encode and redecode to skip packages which would introduce
+			// errors to the system.
+			testOutput, err := spackParser.Encode(newPkg)
+			if err != nil {
+				goto END
+			}
+			_, err = spackParser.Decode(testOutput)
+			if err != nil {
+				goto END
+			}
+			p.Data = newPkg.(*SpackPackage).Data
+			p.Raw = newPkg.(*SpackPackage).Raw
+
+			// Setup fake result for new package.py
+			if !found {
+				result.Location = newPkg.GetURL()
+				result.Version = newPkg.GetLatestVersion()
+				result.Published = time.Now()
+				result.Name = "spack/upstream"
+				return true, result
+			}
+		}
+	}
+END:
 	outOfDate := found && result.Version.Less(p.Data.LatestVersion.Value)
 	return outOfDate, result
 }
 
 func (p *SpackPackage) UpdatePackage(input results.Result) (err error) {
-	return p.AddVersion(input)
+	if input.Name != "spack/upstream" {
+		return p.AddVersion(input)
+	}
+	return nil
 }
 
 // patchGitURL attempts to find an updated release url based on the version from the git url.
@@ -133,4 +187,15 @@ func patchGitURL(url string, input version.Version) (output string, found bool) 
 		return "", false
 	}
 	return output, true
+}
+
+// ToHypenCase converts a string to a hyphenated version appropriate
+// for the commandline.
+func toHyphenCase(str string) string {
+	var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+	var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
+
+	snake := matchFirstCap.ReplaceAllString(str, "${1}-${2}")
+	snake = matchAllCap.ReplaceAllString(snake, "${1}-${2}")
+	return strings.ToLower(snake)
 }
