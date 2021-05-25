@@ -106,6 +106,11 @@ func (p *SpackPackage) GetDependencies() []string {
 	return p.Data.Dependencies
 }
 
+// GetDescription returns the package's description.
+func (p *SpackPackage) GetDescription() string {
+	return p.Data.Description
+}
+
 // CheckUpdate checks for an update to source code project
 // of the current Spack package.
 func (p *SpackPackage) CheckUpdate() (outofDate bool, result results.Result) {

@@ -24,6 +24,7 @@ type Package interface {
 	GetName() (result string)
 	GetDependencies() (results []string)
 	GetGitURL() (result string)
+	GetDescription() (result string)
 	CheckUpdate() (outOfDate bool, result results.Result)
 	UpdatePackage(input results.Result) (err error)
 }

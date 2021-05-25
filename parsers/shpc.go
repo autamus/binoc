@@ -149,6 +149,11 @@ func (s *ContainerSpec) GetDependencies() []string {
 	return []string{}
 }
 
+// GetDescription returns the package's description.
+func (s *ContainerSpec) GetDescription() string {
+	return s.Description
+}
+
 // CheckUpdate checks for an update to the container
 func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output results.Result) {
 	outOfDate = false
