@@ -18,6 +18,9 @@ func getURL(path string) (url string, err error) {
 		return url, err
 	}
 	remotes, err := r.Remotes()
+	if err != nil {
+		return url, err
+	}
 	return remotes[0].Config().URLs[0], nil
 }
 
