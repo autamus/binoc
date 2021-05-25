@@ -57,7 +57,7 @@ func init() {
 }
 
 func defaultConfig() {
-	Global.General.Version = "0.3.0"
+	Global.General.Version = "0.3.2"
 	Global.Parsers.Loaded = "spack,shpc"
 	Global.Branch.Prefix = "binoc/"
 	Global.PR.IgnoreLabel = "binoc-blacklist"
