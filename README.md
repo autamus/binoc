@@ -35,7 +35,7 @@ jobs:
           fetch-depth: '0'
         
       - name: Run Binoc Scan
-        uses: autamus/binoc@v0.2.3
+        uses: autamus/binoc@v0.3.4
         with:
           git_token: ${{ secrets.BINOC_GIT_TOKEN }}
           git_username: ${{ secrets.BINOC_GIT_USERNAME }}
