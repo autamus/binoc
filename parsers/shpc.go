@@ -87,6 +87,7 @@ type ContainerSpec struct {
 	Filter        []string          `yaml:"filter,omitempty"`
 	Aliases       map[string]string `yaml:"-"`
 	AliasesStruct []Alias           `yaml:"-"`
+	Features      map[string]bool   `yaml:"features,omitempty"`
 }
 
 type AliasMap struct {
