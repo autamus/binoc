@@ -119,7 +119,7 @@ func (p *SpackPackage) CheckUpdate() (outofDate bool, result results.Result) {
 	if !found {
 		out, found = lookout.CheckUpdate(p.GetGitURL())
 		if found {
-			result.Location, found = patchGitURL(url, result.Version)
+			out.Location, found = patchGitURL(url, out.Version)
 		}
 	}
 	if found {
