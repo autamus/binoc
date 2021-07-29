@@ -18,7 +18,7 @@ func Push(path string, gitUsername string, gitToken string) (err error) {
 		return err
 	}
 	// Generate <src>:<dest> reference string
-	refStr := "+" + h.Name().String() + ":" + h.Name().String()
+	refStr := h.Name().String() + ":" + h.Name().String()
 	// Push Branch to Origin
 	err = r.Push(&git.PushOptions{
 		RefSpecs: []config.RefSpec{config.RefSpec(refStr)},
