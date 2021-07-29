@@ -33,6 +33,5 @@ func Pull(path string, gitUsername string, gitToken string) (err error) {
 			},
 		},
 	)
-
 	return err
 }
