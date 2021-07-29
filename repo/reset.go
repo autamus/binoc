@@ -28,7 +28,12 @@ func Reset(path string) (err error) {
 		return err
 	}
 
-	return w.Reset(&git.ResetOptions{
+	err = w.Reset(&git.ResetOptions{
 		Commit: parent.Hash,
 	})
+	if err != nil {
+		return err
+	}
+	_, err = w.Add(".")
+	return err
 }
