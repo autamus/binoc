@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+var Version string = "develop"
+
 // Config defines the configuration struct for importing settings from ENV Variables
 type Config struct {
 	General general
@@ -57,7 +59,7 @@ func init() {
 }
 
 func defaultConfig() {
-	Global.General.Version = "0.3.5"
+	Global.General.Version = Version
 	Global.Parsers.Loaded = "spack,shpc"
 	Global.Branch.Prefix = "binoc/"
 	Global.PR.IgnoreLabel = "binoc-blacklist"

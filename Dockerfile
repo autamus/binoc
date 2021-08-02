@@ -1,6 +1,8 @@
 # Start from the latest golang base image
 FROM golang:alpine as builder
 
+ARG version
+
 # Add Maintainer Info
 LABEL maintainer="Alec Scott <alecbcs@github.com>"
 
@@ -27,7 +29,7 @@ RUN apk add --no-cache \
     linux-headers
 
 # Build the Go app
-RUN go build -o binoc .
+RUN go build -ldflags "-s -w -X github.com/autamus/binoc/config.Version=$version" -o binoc .
 
 # Start again with minimal envoirnment.
 FROM alpine
