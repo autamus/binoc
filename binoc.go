@@ -25,7 +25,7 @@ func main() {
 | |_) | | | | | (_) | (__ 
 |____/|_|_| |_|\___/ \___|
 `)
-	fmt.Printf("Application Version: v%s\n", config.Global.General.Version)
+	fmt.Printf("Application Version: %s\n", config.Global.General.Version)
 	fmt.Println()
 
 	input := make(chan repo.Result, 20)
