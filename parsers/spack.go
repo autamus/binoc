@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"regexp"
 	"strings"
 	"time"
@@ -140,6 +141,7 @@ func (p *SpackPackage) CheckUpdate() (outofDate bool, result results.Result) {
 		}
 		spackParser := Spack{}
 		newPkg, err := spackParser.Decode(string(body))
+		newSpackPkg := newPkg.(*SpackPackage)
 		if err != nil {
 			goto END
 		}
@@ -154,17 +156,40 @@ func (p *SpackPackage) CheckUpdate() (outofDate bool, result results.Result) {
 			if err != nil {
 				goto END
 			}
-			p.Data = newPkg.(*SpackPackage).Data
-			p.Raw = newPkg.(*SpackPackage).Raw
+			p.Data = newSpackPkg.Data
+			p.Raw = newSpackPkg.Raw
 
 			// Setup fake result for new package.py
-			if !found {
-				result.Location = newPkg.GetURL()
-				result.Version = newPkg.GetLatestVersion()
-				result.Published = time.Now()
-				result.Name = "spack/upstream"
-				return true, result
+			result.Location = newPkg.GetURL()
+			result.Version = newPkg.GetLatestVersion()
+			result.Published = time.Now()
+			result.Name = "spack/upstream"
+			return true, result
+		} else if p.Data.BuildInstructions != newSpackPkg.Data.BuildInstructions ||
+			!reflect.DeepEqual(p.Data.Dependencies, newSpackPkg.Data.Dependencies) ||
+			p.Data.Homepage != newSpackPkg.Data.Homepage {
+			// Test encode and redecode to skip packages which would introduce
+			// errors to the system.
+			testOutput, err := spackParser.Encode(newPkg)
+			if err != nil {
+				goto END
 			}
+			_, err = spackParser.Decode(testOutput)
+			if err != nil {
+				goto END
+			}
+			// Update Package from Upstream Link
+			versions := p.Data.Versions
+			p.Data = newSpackPkg.Data
+			p.Raw = newSpackPkg.Raw
+			p.Data.Versions = versions
+
+			// Setup fake result for new package.py
+			result.Location = newPkg.GetURL()
+			result.Version = newPkg.GetLatestVersion()
+			result.Published = time.Now()
+			result.Name = "spack/upstream"
+			return true, result
 		}
 	}
 END:
