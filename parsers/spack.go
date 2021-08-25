@@ -153,7 +153,7 @@ func (p *SpackPackage) CheckUpdate() (outofDate bool, result results.Result) {
 				goto END
 			}
 			_, err = spackParser.Decode(testOutput)
-			if err != nil {
+			if err != nil || testOutput == p.Raw {
 				goto END
 			}
 			p.Data = newSpackPkg.Data
@@ -175,7 +175,7 @@ func (p *SpackPackage) CheckUpdate() (outofDate bool, result results.Result) {
 				goto END
 			}
 			_, err = spackParser.Decode(testOutput)
-			if err != nil {
+			if err != nil || testOutput == p.Raw {
 				goto END
 			}
 			// Update Package from Upstream Link
