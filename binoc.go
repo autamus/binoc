@@ -87,17 +87,24 @@ func main() {
 
 	for app := range output {
 		name := app.Package.GetName()
-
-		fmt.Printf("Updating %-30s", name+"...")
+		if strings.HasPrefix(app.LookOutput.Name, "spack") {
+			fmt.Printf("Fixing %-32s", name+"...")
+		} else {
+			fmt.Printf("Updating %-30s", name+"...")
+		}
 
 		var commitMessage, newBranchName string
 		var pr github.Issue
 
 		// Only run git checkouts, commits, if binoc is managing PRs
 		if config.Global.PR.Skip == "false" {
-
-			newBranchName = fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
-			commitMessage = fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
+			if strings.HasPrefix(app.LookOutput.Name, "spack") {
+				newBranchName = fmt.Sprintf("%sfix-%s", config.Global.Branch.Prefix, name)
+				commitMessage = fmt.Sprintf("Pull Changes to %s from Upstream", name)
+			} else {
+				newBranchName = fmt.Sprintf("%supdate-%s", config.Global.Branch.Prefix, name)
+				commitMessage = fmt.Sprintf("Update %s to %s", name, strings.Join(app.LookOutput.Version, "."))
+			}
 
 			// Search for previous open pull requests so that we don't create duplicates.
 			pr, err = repo.SearchPR(path, commitMessage, config.Global.Git.Token)
