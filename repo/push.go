@@ -7,19 +7,24 @@ import (
 )
 
 // Push performs a "git push" on the repository.
-func (r *Repo) Push() (err error) {
-	h, err := r.backend.Head()
+func Push(path string, gitUsername string, gitToken string) (err error) {
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return err
+	}
+
+	h, err := r.Head()
 	if err != nil {
 		return err
 	}
 	// Generate <src>:<dest> reference string
 	refStr := h.Name().String() + ":" + h.Name().String()
 	// Push Branch to Origin
-	err = r.backend.Push(&git.PushOptions{
+	err = r.Push(&git.PushOptions{
 		RefSpecs: []config.RefSpec{config.RefSpec(refStr)},
 		Auth: &http.BasicAuth{
-			Username: r.gitOptions.Username,
-			Password: r.gitOptions.Token,
+			Username: gitUsername,
+			Password: gitToken,
 		},
 	})
 	return err

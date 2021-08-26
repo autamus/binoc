@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -39,30 +38,19 @@ func main() {
 
 	path := config.Global.Repo.Path
 	if config.Global.General.Action == "true" {
-		path = filepath.Join("/github/workspace", path)
+		path = "/github/workspace/" + path
 	}
 
 	fmt.Println("[Parsing Container Blueprints]")
 
 	// Parse Config Value into list of parser names
-	repo, err := repo.Init(path,
-		strings.Split(config.Global.Parsers.Loaded, ","),
-		&repo.RepoGitOptions{
-			Name:     config.Global.Git.Name,
-			Username: config.Global.Git.Username,
-			Email:    config.Global.Git.Email,
-			Token:    config.Global.Git.Token,
-		},
-	)
-	if err != nil {
-		printError(err)
-	}
+	repo.Init(strings.Split(config.Global.Parsers.Loaded, ","))
 
 	// Set Config Value to Spack Parser
 	parsers.SpackUpstreamLink = config.Global.Repo.SpackUpstreamLink
 
 	// Pull Git Repository Updates
-	err = repo.Pull()
+	err := repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
 	if err != nil && err != git.NoErrAlreadyUpToDate {
 		printError(err)
 	}
@@ -79,14 +67,7 @@ func main() {
 
 	wg := sync.WaitGroup{}
 	for i := 0; i < runtime.NumCPU()*2; i++ {
-		go update.RunPollWorker(
-			&wg,
-			&repo,
-			config.Global.Repo.SpackUpstreamLink,
-			config.Global.Git.Token,
-			input,
-			output,
-		)
+		go update.RunPollWorker(&wg, input, output)
 		wg.Add(1)
 	}
 
@@ -97,14 +78,14 @@ func main() {
 		close(output)
 	}()
 
-	// Store the name of the "main" branch that we
-	// started on.
-	mainBranchName, err := repo.GetBranchName()
+	// Store the name of the "main" branch that we started on
+	mainBranchName, err := repo.GetBranchName(path)
 	if err != nil {
 		printError(err)
 	}
 
 	for app := range output {
+		fmt.Println(app)
 		name := app.Package.GetName()
 		if strings.HasPrefix(app.LookOutput.Name, "spack") {
 			fmt.Printf("Fixing %-32s", name+"...")
@@ -126,7 +107,7 @@ func main() {
 			}
 
 			// Search for previous open pull requests so that we don't create duplicates.
-			pr, err = repo.SearchPR(commitMessage)
+			pr, err = repo.SearchPR(path, commitMessage, config.Global.Git.Token)
 			if err != nil && err.Error() != "not found" {
 				printError(err)
 			}
@@ -145,17 +126,17 @@ func main() {
 			}
 
 			// Pull an existing branch to update if possible.
-			err = repo.PullBranch(newBranchName)
+			err = repo.PullBranch(path, newBranchName)
 			if err != nil {
 				if err.Error() == "branch not found" {
-					err = repo.CreateBranch(newBranchName)
+					err = repo.CreateBranch(path, newBranchName)
 				}
 				if err != nil {
 					printError(err)
 				}
 			}
 
-			err = repo.SwitchBranch(newBranchName)
+			err = repo.SwitchBranch(path, newBranchName)
 			if err != nil {
 				printError(err)
 			}
@@ -170,21 +151,21 @@ func main() {
 		// If we are not managing prs, continue in loop to update
 		if config.Global.PR.Skip == "false" {
 
-			err = repo.Commit(commitMessage)
+			err = repo.Commit(path, commitMessage, config.Global.Git.Name, config.Global.Git.Email)
 			if err != nil {
 				printError(err)
 			}
 
-			err = repo.Push()
+			err = repo.Push(path, config.Global.Git.Username, config.Global.Git.Token)
 			if err != nil {
 				if err != nil {
 					printError(err)
 				}
 			}
 
-			pr, err = repo.SearchPrByBranch(newBranchName)
+			pr, err = repo.SearchPrByBranch(path, newBranchName, config.Global.Git.Token)
 			if err == nil && *pr.State == "open" {
-				err = repo.UpdatePR(pr, commitMessage)
+				err = repo.UpdatePR(pr, path, commitMessage, config.Global.Git.Token)
 				if err != nil {
 					printError(err)
 				}
@@ -192,12 +173,12 @@ func main() {
 				if err != nil && err.Error() != "not found" {
 					printError(err)
 				}
-				err = repo.OpenPR(mainBranchName, commitMessage)
+				err = repo.OpenPR(path, mainBranchName, commitMessage, config.Global.Git.Token)
 				if err != nil {
 					printError(err)
 				}
 			}
-			err = repo.SwitchBranch(mainBranchName)
+			err = repo.SwitchBranch(path, mainBranchName)
 			if err != nil {
 				printError(err)
 			}

@@ -6,13 +6,17 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 )
 
-func (r *Repo) Pull() (err error) {
-	w, err := r.backend.Worktree()
+func Pull(path string, gitUsername string, gitToken string) (err error) {
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return err
+	}
+	w, err := r.Worktree()
 	if err != nil {
 		return err
 	}
 
-	branchName, err := r.GetBranchName()
+	branchName, err := GetBranchName(path)
 	if err != nil {
 		return err
 	}
@@ -24,8 +28,8 @@ func (r *Repo) Pull() (err error) {
 			Force:         true,
 			ReferenceName: plumbing.NewBranchReferenceName(branchName),
 			Auth: &http.BasicAuth{
-				Username: r.gitOptions.Username,
-				Password: r.gitOptions.Token,
+				Username: gitUsername,
+				Password: gitToken,
 			},
 		},
 	)

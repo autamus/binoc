@@ -9,21 +9,27 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type SHPC struct {
-}
+type SHPC struct {}
 
 func init() {
 	registerParser(SHPC{}, "container.yaml")
 }
 
+// shpc does not allow a prefix
+func (s SHPC) AllowsPrefix() bool {
+	return false
+}
+
 // Decode decodes a Container YAML Spec using a yaml parser.
 func (s SHPC) Decode(content string) (pkg Package, err error) {
+
 	// Parse YAML file
 	internal := &ContainerSpec{}
 	err = yaml.Unmarshal([]byte(content), &internal)
 	if err != nil {
 		return internal, err
 	}
+
 	// Attempt to decode aliases by map
 	aMap := AliasMap{}
 	err = yaml.Unmarshal([]byte(content), &aMap)
@@ -115,24 +121,11 @@ func (s *ContainerSpec) AddVersion(input results.Result) (err error) {
 }
 
 // GetLatestVersion returns the latest known tag of the container.
-func (s *ContainerSpec) GetLatestVersion() (result results.Result) {
+func (s *ContainerSpec) GetLatestVersion() (result version.Version) {
 	for k := range s.Latest {
-		return results.Result{
-			Version:  version.Version{k},
-			Location: s.Url,
-		}
+		return version.Version{k}
 	}
 	return
-}
-
-func (s *ContainerSpec) GetAllVersions() (result []results.Result) {
-	for v := range s.Versions {
-		result = append(result, results.Result{
-			Version:  version.Version{v},
-			Location: s.Url,
-		})
-	}
-	return result
 }
 
 // GetURL returns the location of a container for Lookout
@@ -178,7 +171,7 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output results.Result) {
 	out, found := lookout.CheckUpdate(url)
 	if found {
 		result := *out
-		latestKey := s.GetLatestVersion().Version.String()
+		latestKey := s.GetLatestVersion().String()
 		latest := version.Version{latestKey + "@" + s.Latest[latestKey]}
 		var new version.Version
 		if docker {

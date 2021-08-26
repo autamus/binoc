@@ -9,7 +9,7 @@ import (
 )
 
 // UpdatePackage patches the package with the current updated package data.
-func (r *Repo) UpdatePackage(pkg Result) (err error) {
+func UpdatePackage(pkg Result) (err error) {
 	file, err := os.Create(pkg.Path)
 	if err != nil {
 		return err
@@ -36,8 +36,13 @@ func (r *Repo) UpdatePackage(pkg Result) (err error) {
 }
 
 // Commit performs a git commit on the repository.
-func (r *Repo) Commit(commitMessage string) (err error) {
-	w, err := r.backend.Worktree()
+func Commit(path string, commitMessage string, gitName string, gitEmail string) (err error) {
+	r, err := git.PlainOpen(path)
+	if err != nil {
+		return err
+	}
+
+	w, err := r.Worktree()
 	if err != nil {
 		return err
 	}
@@ -49,8 +54,8 @@ func (r *Repo) Commit(commitMessage string) (err error) {
 
 	commit, err := w.Commit(commitMessage, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  r.gitOptions.Name,
-			Email: r.gitOptions.Email,
+			Name:  gitName,
+			Email: gitEmail,
 			When:  time.Now(),
 		},
 	})
@@ -58,7 +63,7 @@ func (r *Repo) Commit(commitMessage string) (err error) {
 		return err
 	}
 
-	_, err = r.backend.CommitObject(commit)
+	_, err = r.CommitObject(commit)
 	if err != nil {
 		return err
 	}
