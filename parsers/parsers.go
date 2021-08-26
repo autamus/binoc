@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/DataDrake/cuppa/results"
-	"github.com/DataDrake/cuppa/version"
 )
 
 // Parser is a universal parser interface implemented by
@@ -19,7 +18,8 @@ type Parser interface {
 // with packages in Binoc.
 type Package interface {
 	AddVersion(results.Result) (err error)
-	GetLatestVersion() (result version.Version)
+	GetLatestVersion() (result results.Result)
+	GetAllVersions() (result []results.Result)
 	GetURL() (result string)
 	GetName() (result string)
 	GetDependencies() (results []string)

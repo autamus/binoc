@@ -44,13 +44,24 @@ func main() {
 	fmt.Println("[Parsing Container Blueprints]")
 
 	// Parse Config Value into list of parser names
-	repo.Init(strings.Split(config.Global.Parsers.Loaded, ","))
+	repo, err := repo.Init(config.Global.Repo.Path,
+		strings.Split(config.Global.Parsers.Loaded, ","),
+		&repo.RepoGitOptions{
+			Name:     config.Global.Git.Name,
+			Username: config.Global.Git.Username,
+			Email:    config.Global.Git.Email,
+			Token:    config.Global.Git.Token,
+		},
+	)
+	if err != nil {
+		printError(err)
+	}
 
 	// Set Config Value to Spack Parser
 	parsers.SpackUpstreamLink = config.Global.Repo.SpackUpstreamLink
 
 	// Pull Git Repository Updates
-	err := repo.Pull(path, config.Global.Git.Username, config.Global.Git.Token)
+	err = repo.Pull()
 	if err != nil && err != git.NoErrAlreadyUpToDate {
 		printError(err)
 	}
@@ -67,7 +78,14 @@ func main() {
 
 	wg := sync.WaitGroup{}
 	for i := 0; i < runtime.NumCPU()*2; i++ {
-		go update.RunPollWorker(&wg, input, output)
+		go update.RunPollWorker(
+			&wg,
+			&repo,
+			config.Global.Repo.SpackUpstreamLink,
+			config.Global.Git.Token,
+			input,
+			output,
+		)
 		wg.Add(1)
 	}
 
@@ -80,7 +98,7 @@ func main() {
 
 	// Store the name of the "main" branch that we
 	// started on.
-	mainBranchName, err := repo.GetBranchName(path)
+	mainBranchName, err := repo.GetBranchName()
 	if err != nil {
 		printError(err)
 	}
@@ -107,7 +125,7 @@ func main() {
 			}
 
 			// Search for previous open pull requests so that we don't create duplicates.
-			pr, err = repo.SearchPR(path, commitMessage, config.Global.Git.Token)
+			pr, err = repo.SearchPR(commitMessage)
 			if err != nil && err.Error() != "not found" {
 				printError(err)
 			}
@@ -126,17 +144,17 @@ func main() {
 			}
 
 			// Pull an existing branch to update if possible.
-			err = repo.PullBranch(path, newBranchName)
+			err = repo.PullBranch(newBranchName)
 			if err != nil {
 				if err.Error() == "branch not found" {
-					err = repo.CreateBranch(path, newBranchName)
+					err = repo.CreateBranch(newBranchName)
 				}
 				if err != nil {
 					printError(err)
 				}
 			}
 
-			err = repo.SwitchBranch(path, newBranchName)
+			err = repo.SwitchBranch(newBranchName)
 			if err != nil {
 				printError(err)
 			}
@@ -151,21 +169,21 @@ func main() {
 		// If we are not managing prs, continue in loop to update
 		if config.Global.PR.Skip == "false" {
 
-			err = repo.Commit(path, commitMessage, config.Global.Git.Name, config.Global.Git.Email)
+			err = repo.Commit(commitMessage)
 			if err != nil {
 				printError(err)
 			}
 
-			err = repo.Push(path, config.Global.Git.Username, config.Global.Git.Token)
+			err = repo.Push()
 			if err != nil {
 				if err != nil {
 					printError(err)
 				}
 			}
 
-			pr, err = repo.SearchPrByBranch(path, newBranchName, config.Global.Git.Token)
+			pr, err = repo.SearchPrByBranch(newBranchName)
 			if err == nil && *pr.State == "open" {
-				err = repo.UpdatePR(pr, path, commitMessage, config.Global.Git.Token)
+				err = repo.UpdatePR(pr, commitMessage)
 				if err != nil {
 					printError(err)
 				}
@@ -173,12 +191,12 @@ func main() {
 				if err != nil && err.Error() != "not found" {
 					printError(err)
 				}
-				err = repo.OpenPR(path, mainBranchName, commitMessage, config.Global.Git.Token)
+				err = repo.OpenPR(mainBranchName, commitMessage)
 				if err != nil {
 					printError(err)
 				}
 			}
-			err = repo.SwitchBranch(path, mainBranchName)
+			err = repo.SwitchBranch(mainBranchName)
 			if err != nil {
 				printError(err)
 			}
