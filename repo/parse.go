@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Parse parses a single file.
@@ -41,6 +42,14 @@ func (r *Repo) ParseDir(location string, output chan<- Result) {
 	err := filepath.Walk(location, func(path string, info os.FileInfo, err error) error {
 		for ext, parser := range r.enabledParsers {
 			match, _ := filepath.Match(ext, filepath.Base(path))
+
+                       // If we don't have a match and the parser allows a prefix
+                       if !match && parser.AllowsPrefix() {
+
+				fileBasename := filepath.Base(path)
+				match = strings.HasPrefix(fileBasename, ext)
+                       }
+
 			if match {
 				content, err := ioutil.ReadFile(path)
 				if err != nil {

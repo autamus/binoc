@@ -7,17 +7,22 @@ Binoc is a GitHub Actions Workflow & Docker Container that can update package bu
 Binoc is an automatic software maintainer in a box. It builds off of other projects like [Lookout](https://github.com/alecbcs/lookout) and [Cuppa](https://datadrake/cuppa) to check for upstream software releases on GitHub, GitLab, Sourceforge, FTP, etc.... All Binoc requires is access to a directory of package build instructions and it's able to parse the instructions, check for package updates, and patch the build instructions with newer version information if detected. If Binoc is pointed at a Git Repository it will sperate its update process into seperate branches for each package and submit the updates as pull requests on GitHub. Checkout an example of Binoc in action over at the [container-blueprints](https://github.com/autamus/container-blueprints/pulls) repository.
 
 #### Supported Package Formats
-- Spack
 
-(Others Comming Soon)
+- Spack (`spack`) parses [spack.yaml](https://spack.readthedocs.io/en/latest/configuration.html#yaml-format) files.
+- Singularity Registry HPC (`shpc`) parsers the [container.yaml](https://singularity-hpc.readthedocs.io/en/latest/getting_started/developer-guide.html#registry-yaml-files) from shpc.
+- Dockerfile (`dockerfile`) parses the first `FROM` discovered (does not handle multistage build `FROM`)
+
+If you'd like to request a special parser, please [open an issue](https://github.com/autamus/binoc/issues).
 
 ## Usage
+
 Binoc can be run as either a GitHub Action or a Docker Container. You can have binoc
 manage your pull requests (the default) or set `skip_pr` to "true" to manage them on
 your own.
 
 #### Automatic Daily Scan of the Repository containing Spack Packages at 7am PST.
 ###### .github/workflows/binoc.yaml
+
 ```yaml
 name: "Automatic Binoc Scan"
 
@@ -53,26 +58,29 @@ jobs:
 If you are interested in contributing to Binoc, we love pull requests! If you've got a favorite packaging format, we're looking for help writing more package parsers! Checkout [parsers/](https://github.com/autamus/binoc/tree/main/parsers) for examples on how to get started and implement the parser interface.
 
 ## Building Binoc From Source
+
 #### Development Dependencies
 
 - `GCC`
-
 - `Golang`
 
 #### Build
 
 1. Clone this repository
-
 2. `go run binoc.go` <-- run binoc for testing purposes.
-
 3. `go build binoc.go` <-- will build binoc into an executable on your machine.
 
-
 You can then test binoc on a repository by way of exporting environment variables for the
-command. For example:
+command. For example, here is for shpc:
 
 ```bash
 BINOC_REPO_PATH=/path/to/test/ BINOC_PARSERS_LOADED=shpc BINOC_GIT_TOKEN=ghp_xxxx go run binoc.go
+```
+
+And here is for checking the Dockerfile in another directory
+
+```bash
+BINOC_REPO_PATH=/path/to/test BINOC_PARSERS_LOADED=dockerfile BINOC_GIT_TOKEN=ghp_xxxx go run binoc.go
 ```
 
 ## License

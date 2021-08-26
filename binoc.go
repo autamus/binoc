@@ -106,6 +106,7 @@ func main() {
 
 	for app := range output {
 		name := app.Package.GetName()
+		fmt.Println(name)
 		if strings.HasPrefix(app.LookOutput.Name, "spack") {
 			fmt.Printf("Fixing %-32s", name+"...")
 		} else {

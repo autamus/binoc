@@ -9,7 +9,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type SHPC struct {
+type SHPC struct {}
+
+// shpc does not allow a prefix
+func (s SHPC) AllowsPrefix() bool {
+	return false
 }
 
 func init() {

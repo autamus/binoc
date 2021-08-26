@@ -12,6 +12,7 @@ import (
 type Parser interface {
 	Decode(content string) (pkg Package, err error)
 	Encode(pkg Package) (result string, err error)
+	AllowsPrefix() bool
 }
 
 // Package is a universal package interface for working

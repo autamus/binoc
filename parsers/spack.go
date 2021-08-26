@@ -20,7 +20,12 @@ var (
 )
 
 // Spack is a wrapper struct for the Spack Parser
-type Spack struct {
+type Spack struct {}
+
+
+// Spack does not allow a prefix
+func (s Spack) AllowsPrefix() bool {
+	return false
 }
 
 func init() {
