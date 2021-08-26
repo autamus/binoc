@@ -115,11 +115,24 @@ func (s *ContainerSpec) AddVersion(input results.Result) (err error) {
 }
 
 // GetLatestVersion returns the latest known tag of the container.
-func (s *ContainerSpec) GetLatestVersion() (result version.Version) {
+func (s *ContainerSpec) GetLatestVersion() (result results.Result) {
 	for k := range s.Latest {
-		return version.Version{k}
+		return results.Result{
+			Version:  version.Version{k},
+			Location: s.Url,
+		}
 	}
 	return
+}
+
+func (s *ContainerSpec) GetAllVersions() (result []results.Result) {
+	for v := range s.Versions {
+		result = append(result, results.Result{
+			Version:  version.Version{v},
+			Location: s.Url,
+		})
+	}
+	return result
 }
 
 // GetURL returns the location of a container for Lookout
@@ -165,7 +178,7 @@ func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output results.Result) {
 	out, found := lookout.CheckUpdate(url)
 	if found {
 		result := *out
-		latestKey := s.GetLatestVersion().String()
+		latestKey := s.GetLatestVersion().Version.String()
 		latest := version.Version{latestKey + "@" + s.Latest[latestKey]}
 		var new version.Version
 		if docker {

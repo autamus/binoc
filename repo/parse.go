@@ -10,9 +10,9 @@ import (
 )
 
 // Parse parses a single file.
-func Parse(path string) (output Result, err error) {
+func (r *Repo) Parse(path string) (output Result, err error) {
 	match := false
-	for ext, parser := range enabledParsers {
+	for ext, parser := range r.enabledParsers {
 		match, _ = filepath.Match(ext, filepath.Base(path))
 		if match {
 			content, err := ioutil.ReadFile(path)
@@ -24,6 +24,7 @@ func Parse(path string) (output Result, err error) {
 			if err != nil {
 				return output, err
 			}
+
 			output = Result{Parser: parser, Package: result, Path: path}
 			break
 		}
@@ -36,9 +37,9 @@ func Parse(path string) (output Result, err error) {
 }
 
 // ParseDir walks through the repository and outputs the parsed values of the spack packages.
-func ParseDir(location string, output chan<- Result) {
+func (r *Repo) ParseDir(location string, output chan<- Result) {
 	err := filepath.Walk(location, func(path string, info os.FileInfo, err error) error {
-		for ext, parser := range enabledParsers {
+		for ext, parser := range r.enabledParsers {
 			match, _ := filepath.Match(ext, filepath.Base(path))
 			if match {
 				content, err := ioutil.ReadFile(path)
