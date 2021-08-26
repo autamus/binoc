@@ -44,7 +44,7 @@ func main() {
 	fmt.Println("[Parsing Container Blueprints]")
 
 	// Parse Config Value into list of parser names
-	repo, err := repo.Init(config.Global.Repo.Path,
+	repo, err := repo.Init(path,
 		strings.Split(config.Global.Parsers.Loaded, ","),
 		&repo.RepoGitOptions{
 			Name:     config.Global.Git.Name,
