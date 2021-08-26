@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -38,7 +39,7 @@ func main() {
 
 	path := config.Global.Repo.Path
 	if config.Global.General.Action == "true" {
-		path = "/github/workspace/" + path
+		path = filepath.Join("/github/workspace", path)
 	}
 
 	fmt.Println("[Parsing Container Blueprints]")

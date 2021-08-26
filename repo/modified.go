@@ -20,6 +20,7 @@ func (r *Repo) LastModified(path string) (result time.Time, err error) {
 
 	commit, err := commits.Next()
 	if err != nil {
+		fmt.Println(path)
 		fmt.Println(err)
 		return result, err
 	}
