@@ -51,6 +51,15 @@ func (s Dockerfile) Decode(content string) (pkg Package, err error) {
 
 			// Do we have an AS something?
 			hasAs := strings.Contains(strings.ToLower(line), " as ")
+
+			// Do we have a comment?
+			hasComment := strings.Contains(strings.ToLower(line), "#")
+
+			// Remove comments for now
+			if hasComment {
+				commentIndex := strings.Index(strings.ToLower(line), "#")
+				line = line[0:commentIndex]			
+			}
 			if hasAs {
 				// Find the index of where " as " starts to split it
 				asIndex := strings.Index(strings.ToLower(line), " as ")
@@ -96,9 +105,13 @@ func (s Dockerfile) Encode(pkg Package) (result string, err error) {
 	lines := strings.Split(internal.Raw, "\n")
 
 	// For each Update, replace exact line with new version
+	// Since we want to preserve the original tag name, we update the recipe with the 
+	// new hash, and this will trigger a rebuild
 	for _, from := range internal.Updates {
 		fmt.Printf("\nUpdating %s:%s to %s on line %d\n", from.Name, from.Version, from.Updated, from.LineNo)
-		lines[from.LineNo] = "FROM " + from.Updated + " " + from.Extra
+
+		// This ensures we keep the tag preserved for future checks, but change the file so it rebuilds
+		lines[from.LineNo] = "FROM " + from.Name + ":" + from.Version + " " + from.Extra + " # " + from.Updated + " "
 	}
 	dockerfile := strings.Join(lines, "\n")
 	return dockerfile, err
@@ -111,6 +124,7 @@ type From struct {
 	Name      string
 	Version   string
 	Updated   string
+	Tag	  string
 
 	// Extra content in the version string
 	Extra	  string
@@ -193,7 +207,7 @@ func (s *DockerfilePackage) CheckUpdate() (outOfDate bool, output results.Result
 			continue
 		}
 
-		// This doesn't have a tag, and is always docker://
+		// This will pin to current tag, not updating the tag
 		url := s.GetNamedURL(from.Container)
 
 		// Check for new latest version
@@ -214,6 +228,7 @@ func (s *DockerfilePackage) CheckUpdate() (outOfDate bool, output results.Result
 				
 				// Updated from with updated version
 				from.Updated = newVersion.String()
+				from.Tag = result.Version.String()
 				s.Updates = append(s.Updates, from)
 				output = result
 			}
