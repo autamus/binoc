@@ -162,11 +162,12 @@ func main() {
 			}
 		}
 
+		// TODO need to uncomment here
 		// Updating the package is run regardless of pr_skip
-		err = repo.UpdatePackage(app)
-		if err != nil {
-			printError(err)
-		}
+		//err = repo.UpdatePackage(app)
+		//if err != nil {
+		//	printError(err)
+		//}
 
 		// If we are not managing prs, continue in loop to update
 		if config.Global.PR.Skip == "false" {

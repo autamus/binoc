@@ -7,10 +7,10 @@ import (
 
 	"github.com/DataDrake/cuppa/results"
 	"github.com/DataDrake/cuppa/version"
-//	lookout "github.com/alecbcs/lookout/update"
+	lookout "github.com/alecbcs/lookout/update"
 )
 
-type Dockerfile struct {}
+type Dockerfile struct{}
 
 func init() {
 	registerParser(Dockerfile{}, "Dockerfile")
@@ -32,6 +32,7 @@ func (s Dockerfile) Decode(content string) (pkg Package, err error) {
 	// Read through each line looking for FROM
 	scanner := bufio.NewScanner(strings.NewReader(content))
 	lineno := 0
+
 	for scanner.Scan() {
 		line := strings.Trim(scanner.Text(), " ")
 
@@ -40,7 +41,7 @@ func (s Dockerfile) Decode(content string) (pkg Package, err error) {
 
 			// Parse the name, version, isVaraible
 			isVariable := strings.Contains(line, "$")
-			
+
 			// Create a new FROM entry
 			newfrom := From{Raw: line, LineNo: lineno, IsVariable: isVariable}
 
@@ -55,7 +56,7 @@ func (s Dockerfile) Decode(content string) (pkg Package, err error) {
 				asIndex := strings.Index(strings.ToLower(line), " as ")
 				line = line[0:asIndex]
 			}
-			// The container includes the name and version			
+			// The container includes the name and version
 			newfrom.Container = line
 
 			// If we have a : then there is a version, otherwise latest
@@ -63,17 +64,18 @@ func (s Dockerfile) Decode(content string) (pkg Package, err error) {
 			version := "latest"
 			if strings.Contains(line, ":") {
 				parts := strings.SplitN(line, ":", 2)
-				containerName = parts[0]	
-				version = parts[1]			
+				containerName = parts[0]
+				version = parts[1]
 			}
 			newfrom.Name = containerName
 			newfrom.Version = version
-			
+
 			// Add the parsed FROM to our list
 			internal.Froms = append(internal.Froms, newfrom)
 		}
 		lineno += 1
 	}
+	fmt.Println(internal.Froms)
 	return internal, err
 }
 
@@ -81,48 +83,47 @@ func (s Dockerfile) Decode(content string) (pkg Package, err error) {
 func (s Dockerfile) Encode(pkg Package) (result string, err error) {
 	internal := pkg.(*DockerfilePackage)
 	internal.Name = ""
-	fmt.Println(internal)
+	// fmt.Println(internal)
 
 	// TODO how to replace current?
 	return result, err
 }
 
-// A FROM stateent
+// A FROM statement
 type From struct {
-	Raw		string
-	Container	string
-	Name		string
-	Version	string
+	Raw       string
+	Container string
+	Name      string
+	Version   string
 
 	// Is the FROM a variable (meaning we shouldn't change it)
-	IsVariable	bool
-	LineNo		int
+	IsVariable bool
+	LineNo     int
 }
 
 // A Dockerfile is a wrapper struct for a Dockerfile
 type DockerfilePackage struct {
-	Name		string
-	Raw		string
-	Froms		[]From
+	Name  string
+	Raw   string
+	Froms []From
 }
 
-// GetAllVersions returns all versions
-func (p *DockerfilePackage) GetAllVersions() (result []results.Result) {
-//	for _, v := range p.Data.Versions {
-//		location := v.URL
-//		if location == "" {
-//			location, _ = patchGitURL(p.GetURL(), v.Value)
-//		}
-//		result = append(result, results.Result{
-//			Version:  v.Value,
-//			Location: location,
-//		})
-//	}
+// GetAllVersions returns all versions (we don't need this yet I think)
+func (s *DockerfilePackage) GetAllVersions() (result []results.Result) {
+	//	for _, v := range p.Data.Versions {
+	//		location := v.URL
+	//		if location == "" {
+	//			location, _ = patchGitURL(p.GetURL(), v.Value)
+	//		}
+	//		result = append(result, results.Result{
+	//			Version:  v.Value,
+	//			Location: location,
+	//		})
+	//	}
 	return result
 }
 
-
-// AddVersion adds a tagged version to a container.
+// AddVersion adds a tagged version to a container (we don't use this)
 func (s *DockerfilePackage) AddVersion(input results.Result) (err error) {
 	// Add version to versions.
 	//s.Versions[input.Version.String()] = input.Name
@@ -132,26 +133,20 @@ func (s *DockerfilePackage) AddVersion(input results.Result) (err error) {
 	return nil
 }
 
-// GetLatestVersion returns the latest known tag of the container.
-func (s *DockerfilePackage) GetLatestVersion() (results.Result) {
-	//for k := range s.Latest {
-	//	return version.Version{k}
-	//}
+// GetLatestVersion returns the latest known tag of the container (we don't use this)
+func (s *DockerfilePackage) GetLatestVersion() results.Result {
 	return results.Result{Version: version.Version{}, Location: ""}
 }
 
-// GetURL returns the location of a container for Lookout
+// We don't use this function - we use the GetURL that takes a docker URI
 func (s *DockerfilePackage) GetURL() (result string) {
 	result = "docker://busybox"
-	//if s.Docker != "" {
-	//	result = "docker://" + s.Docker
-	//	if len(s.Filter) > 0 {
-	//		result = result + ":" + s.Filter[0]
-	//	}
-	//} else {
-	//	result = "https://github.com/" + s.Gh
-	//}
 	return result
+}
+
+// We don't use this function - we use the GetURL that takes a docker URI
+func (s *DockerfilePackage) GetNamedURL(name string) (result string) {
+	return "docker://" + name
 }
 
 // GetGitURL just returns the normal url for a container
@@ -177,60 +172,36 @@ func (s *DockerfilePackage) GetDescription() string {
 // CheckUpdate checks for an update to the container
 func (s *DockerfilePackage) CheckUpdate() (outOfDate bool, output results.Result) {
 	outOfDate = false
-	//url := s.GetURL()
-	//docker := strings.HasPrefix(url, "docker://")
 
-	// Check for new latest version
-	//out, found := lookout.CheckUpdate(url)
-	//if found {
-	//	result := *out
-	//	latestKey := s.GetLatestVersion().String()
-	//	latest := version.Version{latestKey + "@" + s.Latest[latestKey]}
-	//	var new version.Version
-	//	if docker {
-	//		new = version.Version{result.Version.String() + "@" + result.Name}
-	//	} else {
-	//		new = version.Version{latestKey + "@" + result.Version.String()}
-//
-	//		// A gh release expects the "tag" as the recipe extension
-	//		result.Name = result.Version.String()
-//
-	//		// And the digest as the release version
-	//		result.Version = version.NewVersion(latestKey)
-	//	}
-	//	if latest.String() != new.String() {
-	//		outOfDate = true
-	//		s.AddVersion(result)
-	//		output = result
-	//	}
-	//}
+	fmt.Println(s.Froms)
+	// For each FROM, check if it's out of date
+	for _, from := range s.Froms {
 
-	//if docker {
-	//	// Iteratively check previous labels for digest updates
-	//	var baseUrl string
-	//	if len(s.Filter) > 0 {
-	//		baseUrl = strings.TrimSuffix(url, ":"+s.Filter[0])
-	//	} else {
-	//		baseUrl = url
-	//	}
-	//	for tag, digest := range s.Versions {
-	//		out, found := lookout.CheckUpdate(baseUrl + ":" + tag)
-	//		if found {
-	//			result := *out
-	//			if digest != result.Name {
-	//				outOfDate = true
-	//				s.Versions[tag] = result.Name
-	//				if output.Location == "" {
-	//					output = result
-	//				}
-	//				if s.Latest[tag] != "" {
-	//					s.Latest[tag] = result.Name
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+		fmt.Println(from)
+		// This doesn't have a tag, and is always docker://
+		url := s.GetNamedURL(from.Container)
 
+		// Check for new latest version
+		out, found := lookout.CheckUpdate(url)
+
+		// If we find a result, get the latest and compare to current
+		if found {
+			result := *out
+			latestKey := from.Version
+			latest := version.Version{latestKey + "@" + from.Name}
+			newVersion := version.Version{result.Version.String() + "@" + result.Name}
+
+			fmt.Println(latest.String())
+			fmt.Println(newVersion.String())
+
+			if latest.String() != newVersion.String() {
+				outOfDate = true
+				s.AddVersion(result)
+				output = result
+			}
+		}
+
+	}
 	return outOfDate, output
 }
 
