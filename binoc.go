@@ -106,7 +106,6 @@ func main() {
 
 	for app := range output {
 		name := app.Package.GetName()
-		fmt.Println(name)
 		if strings.HasPrefix(app.LookOutput.Name, "spack") {
 			fmt.Printf("Fixing %-32s", name+"...")
 		} else {
@@ -162,12 +161,11 @@ func main() {
 			}
 		}
 
-		// TODO need to uncomment here
 		// Updating the package is run regardless of pr_skip
-		//err = repo.UpdatePackage(app)
-		//if err != nil {
-		//	printError(err)
-		//}
+		err = repo.UpdatePackage(app)
+		if err != nil {
+			printError(err)
+		}
 
 		// If we are not managing prs, continue in loop to update
 		if config.Global.PR.Skip == "false" {

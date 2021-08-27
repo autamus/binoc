@@ -55,6 +55,16 @@ func (s Dockerfile) Decode(content string) (pkg Package, err error) {
 				// Find the index of where " as " starts to split it
 				asIndex := strings.Index(strings.ToLower(line), " as ")
 				line = line[0:asIndex]
+				newfrom.Extra = line[asIndex:]
+			
+			// otherwise, the extra is just whatever is beyond the version
+			} else {
+				parts := strings.SplitN(line, " ", 2)
+				if len(parts) > 1 {
+					newfrom.Extra = parts[1]
+				} else {
+					newfrom.Extra = ""
+				}
 			}
 			// The container includes the name and version
 			newfrom.Container = line
@@ -75,18 +85,23 @@ func (s Dockerfile) Decode(content string) (pkg Package, err error) {
 		}
 		lineno += 1
 	}
-	fmt.Println(internal.Froms)
 	return internal, err
 }
 
 // Encode encodes an updated Dockerfile
 func (s Dockerfile) Encode(pkg Package) (result string, err error) {
 	internal := pkg.(*DockerfilePackage)
-	internal.Name = ""
-	// fmt.Println(internal)
 
-	// TODO how to replace current?
-	return result, err
+	// Start with the original Dockerfile
+	lines := strings.Split(internal.Raw, "\n")
+
+	// For each Update, replace exact line with new version
+	for _, from := range internal.Updates {
+		fmt.Printf("\nUpdating %s:%s to %s on line %d\n", from.Name, from.Version, from.Updated, from.LineNo)
+		lines[from.LineNo] = "FROM " + from.Updated + " " + from.Extra
+	}
+	dockerfile := strings.Join(lines, "\n")
+	return dockerfile, err
 }
 
 // A FROM statement
@@ -95,6 +110,10 @@ type From struct {
 	Container string
 	Name      string
 	Version   string
+	Updated   string
+
+	// Extra content in the version string
+	Extra	  string
 
 	// Is the FROM a variable (meaning we shouldn't change it)
 	IsVariable bool
@@ -105,31 +124,24 @@ type From struct {
 type DockerfilePackage struct {
 	Name  string
 	Raw   string
+
+	// original list of Froms to check or parse
 	Froms []From
+
+	// Final Updates (also froms) that will be used to update!
+	Updates []From
 }
 
-// GetAllVersions returns all versions (we don't need this yet I think)
+// GetAllVersions returns all versions (we don't use this)
 func (s *DockerfilePackage) GetAllVersions() (result []results.Result) {
-	//	for _, v := range p.Data.Versions {
-	//		location := v.URL
-	//		if location == "" {
-	//			location, _ = patchGitURL(p.GetURL(), v.Value)
-	//		}
-	//		result = append(result, results.Result{
-	//			Version:  v.Value,
-	//			Location: location,
-	//		})
-	//	}
 	return result
 }
 
 // AddVersion adds a tagged version to a container (we don't use this)
 func (s *DockerfilePackage) AddVersion(input results.Result) (err error) {
-	// Add version to versions.
-	//s.Versions[input.Version.String()] = input.Name
-	//s.Latest = map[string]string{}
-	// Presume that added version is latest and make latest.
-	//s.Latest[input.Version.String()] = input.Name
+	// TODO need to store entire FROM here as an update to do,
+	// full name, sha/tag, and line number
+	// to some other attribute on the class
 	return nil
 }
 
@@ -173,11 +185,14 @@ func (s *DockerfilePackage) GetDescription() string {
 func (s *DockerfilePackage) CheckUpdate() (outOfDate bool, output results.Result) {
 	outOfDate = false
 
-	fmt.Println(s.Froms)
 	// For each FROM, check if it's out of date
 	for _, from := range s.Froms {
 
-		fmt.Println(from)
+		// If there is a variable, we can't easily parse
+		if from.IsVariable {
+			continue
+		}
+
 		// This doesn't have a tag, and is always docker://
 		url := s.GetNamedURL(from.Container)
 
@@ -188,15 +203,18 @@ func (s *DockerfilePackage) CheckUpdate() (outOfDate bool, output results.Result
 		if found {
 			result := *out
 			latestKey := from.Version
-			latest := version.Version{latestKey + "@" + from.Name}
-			newVersion := version.Version{result.Version.String() + "@" + result.Name}
 
-			fmt.Println(latest.String())
-			fmt.Println(newVersion.String())
+			// Latest key is going to be a sha256sum, not a tag
+			// TODO: question - can we keep an associated tag?
+			latest := version.Version{from.Name + "@" + latestKey}
+			newVersion := version.Version{from.Name + "@" + result.Name}
 
 			if latest.String() != newVersion.String() {
 				outOfDate = true
-				s.AddVersion(result)
+				
+				// Updated from with updated version
+				from.Updated = newVersion.String()
+				s.Updates = append(s.Updates, from)
 				output = result
 			}
 		}
