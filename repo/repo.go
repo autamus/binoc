@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"sync"
+	"time"
 
 	"github.com/DataDrake/cuppa/results"
 	"github.com/autamus/binoc/parsers"
@@ -15,6 +15,7 @@ type Result struct {
 	Parser     parsers.Parser
 	LookOutput results.Result
 	Path       string
+	Modified   time.Time
 }
 
 type Repo struct {
@@ -22,7 +23,6 @@ type Repo struct {
 	enabledParsers map[string]parsers.Parser
 	backend        *git.Repository
 	gitOptions     *RepoGitOptions
-	lock           *sync.Mutex
 }
 
 type RepoGitOptions struct {
@@ -46,7 +46,6 @@ func Init(path string, inputParserNames []string, opts *RepoGitOptions) (result 
 	// Open connection to the backend git repository.
 	result.gitOptions = opts
 	result.backend, err = git.PlainOpen(path)
-	result.lock = &sync.Mutex{}
 	result.Path = path
 	return result, err
 }

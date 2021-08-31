@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Parse parses a single file.
@@ -54,7 +55,18 @@ func (r *Repo) ParseDir(location string, output chan<- Result) {
 					continue
 				}
 
-				output <- Result{Parser: parser, Package: result, Path: path}
+				modified, err := r.LastModified(strings.TrimPrefix(path, r.Path+"/"))
+				if err != nil {
+					continue
+				}
+
+				output <- Result{
+					Parser:   parser,
+					Package:  result,
+					Path:     path,
+					Modified: modified,
+				}
+				fmt.Println(path)
 				break
 			}
 		}

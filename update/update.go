@@ -32,15 +32,11 @@ func RunPollWorker(
 			app.LookOutput = result
 		}
 		if upstreamTemplatePath != "" {
-			localModified, err := repo.LastModified(strings.TrimPrefix(app.Path, repo.Path+"/"))
-			if err != nil {
-				goto END
-			}
 			pkg, remoteModified, err := upstream.GetPackage(upstreamTemplatePath, toHyphenCase(app.Package.GetName()), token)
 			if err != nil {
 				goto END
 			}
-			if remoteModified.After(localModified) {
+			if remoteModified.After(app.Modified) {
 				for _, version := range app.Package.GetAllVersions() {
 					pkg.AddVersion(version)
 				}
