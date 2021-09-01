@@ -8,10 +8,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // Parse parses a single file.
-func (r *Repo) Parse(path string) (output Result, err error) {
+func (r *Repo) Parse(path string, checkMod bool) (output Result, err error) {
 	match := false
 	for ext, parser := range r.enabledParsers {
 		match, _ = filepath.Match(ext, filepath.Base(path))
@@ -26,7 +27,20 @@ func (r *Repo) Parse(path string) (output Result, err error) {
 				return output, err
 			}
 
-			output = Result{Parser: parser, Package: result, Path: path}
+			var modified time.Time
+			if checkMod {
+				modified, err = r.LastModified(strings.TrimPrefix(path, r.Path+"/"))
+				if err != nil {
+					continue
+				}
+			}
+
+			output = Result{
+				Parser:   parser,
+				Package:  result,
+				Path:     path,
+				Modified: modified,
+			}
 			break
 		}
 	}
@@ -38,7 +52,7 @@ func (r *Repo) Parse(path string) (output Result, err error) {
 }
 
 // ParseDir walks through the repository and outputs the parsed values of the spack packages.
-func (r *Repo) ParseDir(location string, output chan<- Result) {
+func (r *Repo) ParseDir(location string, checkMod bool, output chan<- Result) {
 	err := filepath.Walk(location, func(path string, info os.FileInfo, err error) error {
 		for ext, parser := range r.enabledParsers {
 			match, _ := filepath.Match(ext, filepath.Base(path))
@@ -55,9 +69,12 @@ func (r *Repo) ParseDir(location string, output chan<- Result) {
 					continue
 				}
 
-				modified, err := r.LastModified(strings.TrimPrefix(path, r.Path+"/"))
-				if err != nil {
-					continue
+				var modified time.Time
+				if checkMod {
+					modified, err = r.LastModified(strings.TrimPrefix(path, r.Path+"/"))
+					if err != nil {
+						continue
+					}
 				}
 
 				output <- Result{
