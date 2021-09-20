@@ -1,8 +1,6 @@
 package repo
 
 import (
-	"time"
-
 	"github.com/DataDrake/cuppa/results"
 	"github.com/autamus/binoc/parsers"
 	"github.com/go-git/go-git/v5"
@@ -15,7 +13,6 @@ type Result struct {
 	Parser     parsers.Parser
 	LookOutput results.Result
 	Path       string
-	Modified   time.Time
 }
 
 type Repo struct {

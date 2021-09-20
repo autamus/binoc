@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/autamus/binoc/config"
-	"github.com/autamus/binoc/parsers"
 	"github.com/autamus/binoc/repo"
 	"github.com/autamus/binoc/update"
 	"github.com/go-git/go-git/v5"
@@ -58,9 +57,6 @@ func main() {
 		printError(err)
 	}
 
-	// Set Config Value to Spack Parser
-	parsers.SpackUpstreamLink = config.Global.Repo.SpackUpstreamLink
-
 	// Pull Git Repository Updates
 	err = repo.Pull()
 	if err != nil && err != git.NoErrAlreadyUpToDate {
@@ -82,7 +78,6 @@ func main() {
 		go update.RunPollWorker(
 			&wg,
 			&repo,
-			config.Global.Repo.SpackUpstreamLink,
 			config.Global.Git.Token,
 			input,
 			output,

@@ -22,11 +22,6 @@ func (r *Repo) Parse(path string, checkMod bool) (output Result, err error) {
 				return output, err
 			}
 
-			result, err := parser.Decode(string(content))
-			if err != nil {
-				return output, err
-			}
-
 			var modified time.Time
 			if checkMod {
 				modified, err = r.LastModified(strings.TrimPrefix(path, r.Path+"/"))
@@ -35,11 +30,15 @@ func (r *Repo) Parse(path string, checkMod bool) (output Result, err error) {
 				}
 			}
 
+			result, err := parser.Decode(string(content), modified)
+			if err != nil {
+				return output, err
+			}
+
 			output = Result{
-				Parser:   parser,
-				Package:  result,
-				Path:     path,
-				Modified: modified,
+				Parser:  parser,
+				Package: result,
+				Path:    path,
 			}
 			break
 		}
@@ -62,13 +61,6 @@ func (r *Repo) ParseDir(location string, checkMod bool, output chan<- Result) {
 					return err
 				}
 
-				result, err := parser.Decode(string(content))
-				if err != nil {
-					fmt.Printf("Parse Error: Couldn't Read --> %s\n", path)
-					fmt.Printf("Error: %v\n", err)
-					continue
-				}
-
 				var modified time.Time
 				if checkMod {
 					modified, err = r.LastModified(strings.TrimPrefix(path, r.Path+"/"))
@@ -77,13 +69,18 @@ func (r *Repo) ParseDir(location string, checkMod bool, output chan<- Result) {
 					}
 				}
 
-				output <- Result{
-					Parser:   parser,
-					Package:  result,
-					Path:     path,
-					Modified: modified,
+				result, err := parser.Decode(string(content), modified)
+				if err != nil {
+					fmt.Printf("Parse Error: Couldn't Read --> %s\n", path)
+					fmt.Printf("Error: %v\n", err)
+					continue
 				}
-				fmt.Println(path)
+
+				output <- Result{
+					Parser:  parser,
+					Package: result,
+					Path:    path,
+				}
 				break
 			}
 		}

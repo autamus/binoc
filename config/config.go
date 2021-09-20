@@ -24,8 +24,7 @@ type general struct {
 }
 
 type repo struct {
-	Path              string
-	SpackUpstreamLink string
+	Path string
 }
 
 type git struct {

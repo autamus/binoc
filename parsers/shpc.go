@@ -2,6 +2,7 @@ package parsers
 
 import (
 	"strings"
+	"time"
 
 	"github.com/DataDrake/cuppa/results"
 	"github.com/DataDrake/cuppa/version"
@@ -9,6 +10,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// SHPC holds the shpc parsing engine runner.
 type SHPC struct {
 }
 
@@ -17,7 +19,7 @@ func init() {
 }
 
 // Decode decodes a Container YAML Spec using a yaml parser.
-func (s SHPC) Decode(content string) (pkg Package, err error) {
+func (s SHPC) Decode(content string, modified time.Time) (pkg Package, err error) {
 	// Parse YAML file
 	internal := &ContainerSpec{}
 	err = yaml.Unmarshal([]byte(content), &internal)

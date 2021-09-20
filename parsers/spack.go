@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/DataDrake/cuppa/results"
 	"github.com/DataDrake/cuppa/version"
@@ -15,12 +16,9 @@ import (
 	"github.com/autamus/go-parspack/pkg"
 )
 
-var (
-	SpackUpstreamLink string
-)
-
 // Spack is a wrapper struct for the Spack Parser
 type Spack struct {
+	UpstreamURL string
 }
 
 func init() {
@@ -28,9 +26,11 @@ func init() {
 }
 
 // Decode decodes a Spack Spec using go-parspack
-func (s Spack) Decode(content string) (pkg Package, err error) {
+func (s Spack) Decode(content string, modified time.Time) (pkg Package, err error) {
 	internal := &SpackPackage{}
 	internal.Raw = content
+	internal.Modified = modified
+	internal.UpstreamURL = s.UpstreamURL
 	internal.Data, err = parspack.Decode(string(content))
 	return internal, err
 }
@@ -43,8 +43,10 @@ func (s Spack) Encode(pkg Package) (result string, err error) {
 
 // SpackPackage is a wrapper struct for a Spack Package
 type SpackPackage struct {
-	Data pkg.Package
-	Raw  string
+	Data        pkg.Package
+	Modified    time.Time
+	UpstreamURL string
+	Raw         string
 }
 
 // AddVersion is a wrapper for interacting with a spack package
@@ -140,6 +142,7 @@ func (p *SpackPackage) CheckUpdate() (outofDate bool, result results.Result) {
 	if found {
 		result = *out
 	}
+
 	outOfDate := found && result.Version.Less(p.Data.LatestVersion.Value)
 	return outOfDate, result
 }
@@ -148,7 +151,6 @@ func (p *SpackPackage) UpdatePackage(input results.Result) (err error) {
 	if input.Name != "spack/upstream" {
 		return p.AddVersion(input)
 	}
-	p.Data.URL = input.Location
 	return nil
 }
 
