@@ -36,18 +36,17 @@ func RunPollWorker(
 			if err != nil {
 				goto END
 			}
-			if remoteModified.After(app.Modified) {
+			if remoteModified.After(app.Modified) &&
+				!app.Equals(repository.Result{Package: pkg, Parser: app.Parser}) {
 				for _, version := range app.Package.GetAllVersions() {
 					pkg.AddVersion(version)
 				}
-				if !app.Equals(repository.Result{Package: pkg, Parser: app.Parser}) {
-					app.LookOutput = results.Result{
-						Name:     "spack/upstream",
-						Location: app.Package.GetURL(),
-					}
-					app.Package = pkg
-					outOfDate = true
+				app.LookOutput = results.Result{
+					Name:     "spack/upstream",
+					Location: app.Package.GetURL(),
 				}
+				app.Package = pkg
+				outOfDate = true
 			}
 		}
 	END:
