@@ -49,3 +49,10 @@ func Init(path string, inputParserNames []string, opts *RepoGitOptions) (result 
 	result.Path = path
 	return result, err
 }
+
+func (r *Result) Equals(other Result) bool {
+	aStr, _ := r.Parser.Encode(r.Package)
+	bStr, _ := other.Parser.Encode(other.Package)
+
+	return aStr == bStr
+}

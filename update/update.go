@@ -7,7 +7,7 @@ import (
 
 	"github.com/DataDrake/cuppa/results"
 	lookout "github.com/alecbcs/lookout/update"
-	"github.com/autamus/binoc/repo"
+	repository "github.com/autamus/binoc/repo"
 	"github.com/autamus/binoc/upstream"
 )
 
@@ -20,11 +20,11 @@ func Init(token string) {
 // provided package on the input channel.
 func RunPollWorker(
 	wg *sync.WaitGroup,
-	repo *repo.Repo,
+	repo *repository.Repo,
 	upstreamTemplatePath string,
 	token string,
-	input <-chan repo.Result,
-	output chan<- repo.Result,
+	input <-chan repository.Result,
+	output chan<- repository.Result,
 ) {
 	for app := range input {
 		outOfDate, result := app.Package.CheckUpdate()
@@ -40,12 +40,14 @@ func RunPollWorker(
 				for _, version := range app.Package.GetAllVersions() {
 					pkg.AddVersion(version)
 				}
-				app.LookOutput = results.Result{
-					Name:     "spack/upstream",
-					Location: app.Package.GetURL(),
+				if !app.Equals(repository.Result{Package: pkg, Parser: app.Parser}) {
+					app.LookOutput = results.Result{
+						Name:     "spack/upstream",
+						Location: app.Package.GetURL(),
+					}
+					app.Package = pkg
+					outOfDate = true
 				}
-				app.Package = pkg
-				outOfDate = true
 			}
 		}
 	END:
