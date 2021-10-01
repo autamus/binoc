@@ -76,18 +76,20 @@ func (s SHPC) Encode(pkg Package) (result string, err error) {
 
 // ContainerSpec is a wrapper struct for a container.yaml
 type ContainerSpec struct {
-	Name          string            `yaml:"name,omitempty"`
-	Docker        string            `yaml:"docker,omitempty"`
-	Gh            string            `yaml:"gh,omitempty"`
-	Url           string            `yaml:"url,omitempty"`
-	Maintainer    string            `yaml:"maintainer"`
-	Description   string            `yaml:"description"`
-	Latest        map[string]string `yaml:"latest"`
-	Versions      map[string]string `yaml:"tags"`
-	Filter        []string          `yaml:"filter,omitempty"`
-	Aliases       map[string]string `yaml:"-"`
-	AliasesStruct []Alias           `yaml:"-"`
-	Features      map[string]bool   `yaml:"features,omitempty"`
+	Name            string            `yaml:"name,omitempty"`
+	Docker          string            `yaml:"docker,omitempty"`
+	Gh              string            `yaml:"gh,omitempty"`
+	Url             string            `yaml:"url,omitempty"`
+	Maintainer      string            `yaml:"maintainer"`
+	Description     string            `yaml:"description"`
+	Latest          map[string]string `yaml:"latest"`
+	Versions        map[string]string `yaml:"tags"`
+	Filter          []string          `yaml:"filter,omitempty"`
+	Aliases         map[string]string `yaml:"-"`
+	AliasesStruct   []Alias           `yaml:"-"`
+	Features        map[string]bool   `yaml:"features,omitempty"`
+	SingularityOpts string            `yaml:"singularity_options,omitempty"`
+	DockerOpts      string            `yaml:"docker_options,omitempty"`
 }
 
 type AliasMap struct {
