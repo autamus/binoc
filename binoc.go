@@ -84,6 +84,7 @@ func main() {
 			&repo,
 			config.Global.Repo.SpackUpstreamLink,
 			config.Global.Git.Token,
+			config.Global.Repo.UpstreamOnly == "true",
 			input,
 			output,
 		)

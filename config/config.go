@@ -26,6 +26,7 @@ type general struct {
 type repo struct {
 	Path              string
 	SpackUpstreamLink string
+	UpstreamOnly      string
 }
 
 type git struct {
@@ -64,6 +65,7 @@ func defaultConfig() {
 	Global.Branch.Prefix = "binoc/"
 	Global.PR.IgnoreLabel = "binoc-blacklist"
 	Global.PR.Skip = "true"
+	Global.Repo.UpstreamOnly = "false"
 }
 
 func parseConfigEnv() {

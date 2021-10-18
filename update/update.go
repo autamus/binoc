@@ -23,13 +23,19 @@ func RunPollWorker(
 	repo *repository.Repo,
 	upstreamTemplatePath string,
 	token string,
+	upstreamOnly bool,
 	input <-chan repository.Result,
 	output chan<- repository.Result,
 ) {
 	for app := range input {
-		outOfDate, result := app.Package.CheckUpdate()
-		if outOfDate {
-			app.LookOutput = result
+		var outOfDate bool
+		var result results.Result
+
+		if !upstreamOnly {
+			outOfDate, result = app.Package.CheckUpdate()
+			if outOfDate {
+				app.LookOutput = result
+			}
 		}
 		if upstreamTemplatePath != "" {
 			pkg, remoteModified, err := upstream.GetPackage(upstreamTemplatePath, toHyphenCase(app.Package.GetName()), token)
