@@ -41,6 +41,10 @@ inputs:
     description: 'Tells Binoc where to look for upstream spack package updates.'
     required: false
     default: ''
+  repo_upstreamonly:
+    description: 'Tells Binoc whether to just solely check for updates from the defined upstream link'
+    required: false
+    default: 'false'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/autamus/binoc:latest'
