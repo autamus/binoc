@@ -77,6 +77,7 @@ func (s SHPC) Encode(pkg Package) (result string, err error) {
 // ContainerSpec is a wrapper struct for a container.yaml
 type ContainerSpec struct {
 	Name            string            `yaml:"name,omitempty"`
+	Oras            string            `yaml:"oras,omitempty"`
 	Docker          string            `yaml:"docker,omitempty"`
 	Gh              string            `yaml:"gh,omitempty"`
 	Url             string            `yaml:"url,omitempty"`
@@ -144,7 +145,7 @@ func (s *ContainerSpec) GetURL() (result string) {
 		if len(s.Filter) > 0 {
 			result = result + ":" + s.Filter[0]
 		}
-	} else {
+	} else if s.Gh != "" {
 		result = "https://github.com/" + s.Gh
 	}
 	return result
@@ -174,6 +175,11 @@ func (s *ContainerSpec) GetDescription() string {
 func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output results.Result) {
 	outOfDate = false
 	url := s.GetURL()
+
+	// Cut out early if we don't get a url
+	if url == "" {
+		return outOfDate, results.Result{}
+	}
 	docker := strings.HasPrefix(url, "docker://")
 
 	// Check for new latest version
