@@ -175,6 +175,11 @@ func (s *ContainerSpec) GetDescription() string {
 func (s *ContainerSpec) CheckUpdate() (outOfDate bool, output results.Result) {
 	outOfDate = false
 	url := s.GetURL()
+
+	// Cut out early if we don't get a url
+	if url == "" {
+		return outOfDate, results.Result{}
+	}
 	docker := strings.HasPrefix(url, "docker://")
 
 	// Check for new latest version
