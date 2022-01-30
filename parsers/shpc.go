@@ -140,9 +140,6 @@ func (s *ContainerSpec) GetAllVersions() (result []results.Result) {
 
 // GetURL returns the location of a container for Lookout
 func (s *ContainerSpec) GetURL() (result string) {
-
-	// Empty string means we do not know how to parse (yet)
-	var result string
 	if s.Docker != "" {
 		result = "docker://" + s.Docker
 		if len(s.Filter) > 0 {
