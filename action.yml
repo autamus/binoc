@@ -47,7 +47,7 @@ inputs:
     default: 'false'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/autamus/binoc:latest'
+  image: 'Dockerfile'
 
 branding:
   icon: 'activity'
