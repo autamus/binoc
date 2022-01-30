@@ -141,18 +141,14 @@ func (s *ContainerSpec) GetAllVersions() (result []results.Result) {
 // GetURL returns the location of a container for Lookout
 func (s *ContainerSpec) GetURL() (result string) {
 
-	// Docker and oras are both provided via OCI registries
+	// Empty string means we do not know how to parse (yet)
+	var result string
 	if s.Docker != "" {
 		result = "docker://" + s.Docker
 		if len(s.Filter) > 0 {
 			result = result + ":" + s.Filter[0]
 		}
-	} else if s.Oras != "" {
-		result = "oras://" + s.Oras
-		if len(s.Filter) > 0 {
-			result = result + ":" + s.Filter[0]
-		}
-	} else {
+	} else if s.Gh != "" {
 		result = "https://github.com/" + s.Gh
 	}
 	return result
