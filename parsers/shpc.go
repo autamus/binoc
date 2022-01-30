@@ -142,8 +142,13 @@ func (s *ContainerSpec) GetAllVersions() (result []results.Result) {
 func (s *ContainerSpec) GetURL() (result string) {
 
 	// Docker and oras are both provided via OCI registries
-	if s.Docker != "" || s.Oras != "" {
+	if s.Docker != "" {
 		result = "docker://" + s.Docker
+		if len(s.Filter) > 0 {
+			result = result + ":" + s.Filter[0]
+		}
+	} else if s.Oras != "" {
+		result = "oras://" + s.Oras
 		if len(s.Filter) > 0 {
 			result = result + ":" + s.Filter[0]
 		}
