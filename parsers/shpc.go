@@ -77,6 +77,7 @@ func (s SHPC) Encode(pkg Package) (result string, err error) {
 // ContainerSpec is a wrapper struct for a container.yaml
 type ContainerSpec struct {
 	Name            string            `yaml:"name,omitempty"`
+	Oras            string            `yaml:"oras,omitempty"`
 	Docker          string            `yaml:"docker,omitempty"`
 	Gh              string            `yaml:"gh,omitempty"`
 	Url             string            `yaml:"url,omitempty"`
@@ -139,7 +140,9 @@ func (s *ContainerSpec) GetAllVersions() (result []results.Result) {
 
 // GetURL returns the location of a container for Lookout
 func (s *ContainerSpec) GetURL() (result string) {
-	if s.Docker != "" {
+
+	// Docker and oras are both provided via OCI registries
+	if s.Docker != "" || s.Oras != "" {
 		result = "docker://" + s.Docker
 		if len(s.Filter) > 0 {
 			result = result + ":" + s.Filter[0]
